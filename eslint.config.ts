@@ -176,7 +176,8 @@ export default defineConfig(
       '@typescript-eslint/consistent-type-imports': 'error',
     },
   },
-  // Tests may use fixtures/literals and call the platform/timer APIs directly.
+  // Tests may use fixtures/literals, call the platform/timer APIs directly,
+  // and assert into fixed-shape arrays without re-deriving noUncheckedIndexedAccess guards.
   {
     files: ['tests/**/*.ts'],
     rules: {
@@ -184,6 +185,7 @@ export default defineConfig(
       'no-restricted-properties': 'off',
       'no-restricted-imports': 'off',
       '@typescript-eslint/no-magic-numbers': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },
   {
