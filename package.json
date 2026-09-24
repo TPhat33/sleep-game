@@ -1,0 +1,63 @@
+{
+  "name": "firefly-pond",
+  "version": "0.1.0",
+  "description": "บึงหิ่งห้อย (Firefly Pond) — a relaxation game that helps players fall asleep",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:host": "vite --host",
+    "build": "vue-tsc --build && vite build",
+    "preview": "vite preview --host --port 4173 --strictPort",
+    "typecheck": "vue-tsc --build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "gen:spike-audio": "node scripts/gen-spike-audio.mjs",
+    "cap:sync": "npm run build && cap sync",
+    "cap:ios": "cap open ios",
+    "cap:android": "cap open android",
+    "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && vite build"
+  },
+  "dependencies": {
+    "@capacitor-community/keep-awake": "^8.0.1",
+    "@capacitor-community/screen-brightness": "^8.0.0",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/ios": "^8.5.2",
+    "@capgo/capacitor-media-session": "^8.0.32",
+    "idb": "^8.0.3",
+    "pixi.js": "^8.21.0",
+    "vue": "^3.5.43"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.0.0",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "@vitest/coverage-v8": "^5.0.1",
+    "@vue/test-utils": "^2.5.1",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.11.1",
+    "fake-indexeddb": "^6.2.5",
+    "globals": "^17.12.0",
+    "jsdom": "^30.1.1",
+    "prettier": "^3.9.9",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.1",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1",
+    "vue-tsc": "^3.3.11"
+  }
+}
