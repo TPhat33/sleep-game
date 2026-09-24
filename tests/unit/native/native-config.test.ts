@@ -14,14 +14,11 @@ const APP_DELEGATE = path.join(REPO_ROOT, 'ios/App/App/AppDelegate.swift');
 const ANDROID_MANIFEST = path.join(REPO_ROOT, 'android/app/src/main/AndroidManifest.xml');
 
 describe('iOS native patches', () => {
-  it.skipIf(!existsSync(INFO_PLIST))(
-    'Info.plist declares UIBackgroundModes: audio',
-    () => {
-      const text = readFileSync(INFO_PLIST, 'utf-8');
-      expect(text).toContain('<key>UIBackgroundModes</key>');
-      expect(text).toMatch(/<key>UIBackgroundModes<\/key>\s*<array>\s*<string>audio<\/string>/);
-    },
-  );
+  it.skipIf(!existsSync(INFO_PLIST))('Info.plist declares UIBackgroundModes: audio', () => {
+    const text = readFileSync(INFO_PLIST, 'utf-8');
+    expect(text).toContain('<key>UIBackgroundModes</key>');
+    expect(text).toMatch(/<key>UIBackgroundModes<\/key>\s*<array>\s*<string>audio<\/string>/);
+  });
 
   it.skipIf(!existsSync(APP_DELEGATE))(
     'AppDelegate.swift sets the AVAudioSession .playback category',
@@ -33,7 +30,8 @@ describe('iOS native patches', () => {
   );
 
   if (!existsSync(INFO_PLIST) || !existsSync(APP_DELEGATE)) {
-    it.skip('ios/ is absent in this environment — run `npx cap add ios` and reapply the plan §5.A.14 patch', () => undefined);
+    it.skip('ios/ is absent in this environment — run `npx cap add ios` and reapply the plan §5.A.14 patch', () =>
+      undefined);
   }
 });
 
@@ -46,12 +44,16 @@ describe('Android native patches', () => {
     },
   );
 
-  it.skipIf(!existsSync(ANDROID_MANIFEST))('AndroidManifest.xml does not request the notifications permission', () => {
-    const text = readFileSync(ANDROID_MANIFEST, 'utf-8');
-    expect(text).not.toContain('android.permission.POST_NOTIFICATIONS');
-  });
+  it.skipIf(!existsSync(ANDROID_MANIFEST))(
+    'AndroidManifest.xml does not request the notifications permission',
+    () => {
+      const text = readFileSync(ANDROID_MANIFEST, 'utf-8');
+      expect(text).not.toContain('android.permission.POST_NOTIFICATIONS');
+    },
+  );
 
   if (!existsSync(ANDROID_MANIFEST)) {
-    it.skip('android/ is absent in this environment — run `npx cap add android` and reapply the plan §5.A.14 patch', () => undefined);
+    it.skip('android/ is absent in this environment — run `npx cap add android` and reapply the plan §5.A.14 patch', () =>
+      undefined);
   }
 });

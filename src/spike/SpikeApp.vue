@@ -385,7 +385,10 @@ function onClearLog(): void {
 
     <section class="panel">
       <h2>Brightness</h2>
-      <p>supported: {{ brightnessSupported }} · current: {{ brightnessValue }}</p>
+      <p>
+        {{ brightnessSupported ? 'supported' : 'unsupported (web)' }} · current:
+        {{ brightnessValue }}
+      </p>
       <button @click="onReadBrightness">Read brightness</button>
       <label
         >level <input v-model.number="brightnessSlider" type="range" min="0" max="1" step="0.01"
