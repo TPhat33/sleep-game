@@ -8,6 +8,21 @@ interface TestEvents {
 }
 
 describe('EventBus', () => {
+  it('defaults to logging a listener error via console.error', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const bus = new EventBus<TestEvents>();
+      bus.on('ping', () => {
+        throw new Error('boom');
+      });
+      bus.emit('ping', { at: 1, value: 'x' });
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect((spy.mock.calls[0]?.[0] as Error).message).toBe('boom');
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it('dispatches typed events to subscribers in subscription order', () => {
     const bus = new EventBus<TestEvents>();
     const order: string[] = [];

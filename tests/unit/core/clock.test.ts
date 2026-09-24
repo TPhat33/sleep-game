@@ -1,6 +1,39 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { FakeClock } from '@/core/clock';
+import { FakeClock, RealClock } from '@/core/clock';
+
+describe('RealClock', () => {
+  it('now() returns the current epoch ms', () => {
+    const clock = new RealClock();
+    const before = Date.now();
+    const now = clock.now();
+    const after = Date.now();
+    expect(now).toBeGreaterThanOrEqual(before);
+    expect(now).toBeLessThanOrEqual(after);
+  });
+
+  it('delegates timers to the global timer functions', () => {
+    vi.useFakeTimers();
+    try {
+      const clock = new RealClock();
+      const timeoutFn = vi.fn();
+      const id = clock.setTimeout(timeoutFn, 10);
+      vi.advanceTimersByTime(10);
+      expect(timeoutFn).toHaveBeenCalledTimes(1);
+      clock.clearTimeout(id);
+
+      const intervalFn = vi.fn();
+      const intervalId = clock.setInterval(intervalFn, 10);
+      vi.advanceTimersByTime(30);
+      expect(intervalFn).toHaveBeenCalledTimes(3);
+      clock.clearInterval(intervalId);
+      vi.advanceTimersByTime(100);
+      expect(intervalFn).toHaveBeenCalledTimes(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
 
 describe('FakeClock', () => {
   it('fires timers with the same due time in creation order', () => {

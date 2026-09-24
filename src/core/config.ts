@@ -298,18 +298,18 @@ function deepFreeze<T>(value: T): DeepReadonly<T> {
   return value as DeepReadonly<T>;
 }
 
+// Only ever called with a plain-object `base` (structuredClone(defaults)):
+// a nested value is either another plain object (recurse) or a leaf —
+// including arrays like RESPAWN_DELAY_MS — which an override replaces
+// wholesale rather than merging.
 function deepMerge<T>(base: T, overrides: DeepPartial<T> | undefined): T {
   if (overrides === undefined) return base;
-  if (Array.isArray(base)) return (overrides as unknown as T) ?? base;
-  if (isPlainObject(base)) {
-    const result: Record<string, unknown> = { ...base };
-    for (const [key, value] of Object.entries(overrides as Record<string, unknown>)) {
-      const baseValue = (base as Record<string, unknown>)[key];
-      result[key] = isPlainObject(baseValue) ? deepMerge(baseValue, value as never) : value;
-    }
-    return result as T;
+  const result: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  for (const [key, value] of Object.entries(overrides as Record<string, unknown>)) {
+    const baseValue = (base as Record<string, unknown>)[key];
+    result[key] = isPlainObject(baseValue) ? deepMerge(baseValue, value as never) : value;
   }
-  return (overrides as unknown as T) ?? base;
+  return result as T;
 }
 
 /** The frozen, immutable defaults. Production code reads its slice from here (via bootstrap). */

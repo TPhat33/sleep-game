@@ -61,6 +61,7 @@ export function pickNoRepeat<T>(rng: Rng, items: readonly T[], recent: readonly 
   const candidates = pool.length > 0 ? pool : allIndices;
   const idx = randInt(rng, 0, candidates.length - 1);
   const picked = candidates[idx];
+  /* v8 ignore next 3 -- candidates.length >= 1 and idx is in range by construction; this guards noUncheckedIndexedAccess, not a reachable state. */
   if (picked === undefined) {
     throw new Error('pickNoRepeat() internal error: index out of range');
   }

@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
-import { pickNoRepeat, randInt, randRange, seededRng } from '@/core/rng';
+import { pickNoRepeat, randInt, randRange, seededRng, systemRng } from '@/core/rng';
+
+describe('systemRng', () => {
+  it('produces values in [0, 1)', () => {
+    for (let i = 0; i < 100; i++) {
+      const v = systemRng.next();
+      expect(v).toBeGreaterThanOrEqual(0);
+      expect(v).toBeLessThan(1);
+    }
+  });
+});
 
 describe('seededRng', () => {
   it('is deterministic: the same seed gives the same sequence', () => {
