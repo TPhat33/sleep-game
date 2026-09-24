@@ -1,0 +1,31 @@
+/* Visual tokens — spec §14. No hue in 170°-260° (blue/purple-blue) anywhere. */
+:root {
+  --color-bg-night: #0b0806;
+  --color-water: #140e0a;
+  --color-amber: #c98a3e;
+  --color-ember: #a4502d;
+  --color-moss: #6e6a34;
+  --color-firefly: #e3b25a;
+  --color-gold: #f0c46a;
+  --color-text-dim: #8a6a4a;
+
+  --font-thai: 'IBM Plex Sans Thai Looped', system-ui, sans-serif;
+  --font-size-base: 18px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg-night);
+  color: var(--color-amber);
+  font-family: var(--font-thai);
+  font-size: var(--font-size-base);
+  font-weight: 300;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}

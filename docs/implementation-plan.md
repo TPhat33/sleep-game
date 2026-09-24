@@ -11,21 +11,21 @@ Section references like "spec §5.1" point to the spec document.
 
 ## Top decisions at a glance
 
-| # | Decision | Where |
-|---|---|---|
-| 1 | **Capacitor-first** is the planning assumption. The PWA stays a dev/test target. M0 on-device results confirm or overturn this. | §2.1, §5 |
-| 2 | Clock time is **epoch ms** (`Date.now` semantics), not `performance.now`. iOS's monotonic clock stops during device sleep, and a sleep app has to count sleep time. | §1.3 |
-| 3 | Listen-mode audio is **pre-scheduled on the Web Audio thread**: shuffle words, tail ramp and stop are all queued at listen start, so nothing depends on JS timers running while the screen is locked. | §1.8 |
-| 4 | Audio output goes through an internal `AudioOutput` strategy (`webaudio-direct` or `element-bridge`), so M0's findings change one factory and leave the `AudioEngine` API alone. | §1.8, §4.6 |
-| 5 | Plugins: `@capacitor-community/screen-brightness`, `@capacitor-community/keep-awake`, `@capgo/capacitor-media-session` (Android foreground service), `@capacitor/app`. **No** native audio player plugin by default. | §2.2 |
-| 6 | Pattern is **commands in, events out**. `SessionDirector` is pure logic (Clock + Bus + Estimator + NightWake). A separate `SessionRuntime` glue layer drives audio, platform and persistence. | §1.2 |
-| 7 | An injected `Rng` (seeded in tests) is added alongside `Clock`, and `Math.random` is lint-banned. | §4.2 |
-| 8 | ESLint enforces the spec's rules: no raw timers or `Date.now` outside `clock.ts`, no Capacitor imports outside `src/platform/`, and no UI or framework imports in `src/core/`. | §3.5 |
-| 9 | No vue-router and no Pinia. Screens are selected from director phase plus a small nav state. Services are provided through `provide/inject`. | §2.2 |
-| 10 | TypeScript pinned to **~6.0.3**: TS 7 exists, but typescript-eslint supports only `<6.1`. | §3.1 |
-| 11 | Brown noise comes from a **pre-rendered seamless looping buffer** by default, with the AudioWorklet kept as an option. **[DEVIATION]** | §2.2 |
-| 12 | Audio assets ship as **AAC `.m4a` only**. No ogg. **[DEVIATION]** | §2.2 |
-| 13 | M0 splits into a sandbox half the implementer completes (§5.A) and a device half a human completes (§5.B). **M0 is not formally closed until §5.B is done.** | §5 |
+| #   | Decision                                                                                                                                                                                                             | Where      |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 1   | **Capacitor-first** is the planning assumption. The PWA stays a dev/test target. M0 on-device results confirm or overturn this.                                                                                      | §2.1, §5   |
+| 2   | Clock time is **epoch ms** (`Date.now` semantics), not `performance.now`. iOS's monotonic clock stops during device sleep, and a sleep app has to count sleep time.                                                  | §1.3       |
+| 3   | Listen-mode audio is **pre-scheduled on the Web Audio thread**: shuffle words, tail ramp and stop are all queued at listen start, so nothing depends on JS timers running while the screen is locked.                | §1.8       |
+| 4   | Audio output goes through an internal `AudioOutput` strategy (`webaudio-direct` or `element-bridge`), so M0's findings change one factory and leave the `AudioEngine` API alone.                                     | §1.8, §4.6 |
+| 5   | Plugins: `@capacitor-community/screen-brightness`, `@capacitor-community/keep-awake`, `@capgo/capacitor-media-session` (Android foreground service), `@capacitor/app`. **No** native audio player plugin by default. | §2.2       |
+| 6   | Pattern is **commands in, events out**. `SessionDirector` is pure logic (Clock + Bus + Estimator + NightWake). A separate `SessionRuntime` glue layer drives audio, platform and persistence.                        | §1.2       |
+| 7   | An injected `Rng` (seeded in tests) is added alongside `Clock`, and `Math.random` is lint-banned.                                                                                                                    | §4.2       |
+| 8   | ESLint enforces the spec's rules: no raw timers or `Date.now` outside `clock.ts`, no Capacitor imports outside `src/platform/`, and no UI or framework imports in `src/core/`.                                       | §3.5       |
+| 9   | No vue-router and no Pinia. Screens are selected from director phase plus a small nav state. Services are provided through `provide/inject`.                                                                         | §2.2       |
+| 10  | TypeScript pinned to **~6.0.3**: TS 7 exists, but typescript-eslint supports only `<6.1`.                                                                                                                            | §3.1       |
+| 11  | Brown noise comes from a **pre-rendered seamless looping buffer** by default, with the AudioWorklet kept as an option. **[DEVIATION]**                                                                               | §2.2       |
+| 12  | Audio assets ship as **AAC `.m4a` only**. No ogg. **[DEVIATION]**                                                                                                                                                    | §2.2       |
+| 13  | M0 splits into a sandbox half the implementer completes (§5.A) and a device half a human completes (§5.B). **M0 is not formally closed until §5.B is done.**                                                         | §5         |
 
 ---
 
@@ -188,17 +188,17 @@ The hardest platform risk is **audio continuing, fading and speaking words while
 
 `SessionRuntime` applies this table on each `phase:changed`. **[ADDITION]** The spec only partly defines it (spec §5.4, M3 fade).
 
-| Phase | Wake lock | Native brightness | Background audio session | If app goes to background |
-|---|---|---|---|---|
-| home | released | restore | inactive | nothing |
-| settle | **held** | untouched | inactive | after `APP_BACKGROUND_GRACE_MS` → `ended(app_background)` |
-| play | **held** | untouched | inactive | after grace → `ended(app_background)`, scene paused immediately |
-| drift | **held** | untouched | inactive | after grace → `ended(app_background)` |
-| fade | **held** until ended | `FADE_BRIGHTNESS_TARGET` | inactive | → `ended(fade)` immediately (they fell asleep) |
-| listen | **released** (`LISTEN_HOLD_WAKE_LOCK=false`) | `BRIGHTNESS_MIN` | **active** | continue; nothing changes |
-| ended | released | restore | deactivate after `stopAll` resolves | — |
+| Phase  | Wake lock                                    | Native brightness        | Background audio session            | If app goes to background                                       |
+| ------ | -------------------------------------------- | ------------------------ | ----------------------------------- | --------------------------------------------------------------- |
+| home   | released                                     | restore                  | inactive                            | nothing                                                         |
+| settle | **held**                                     | untouched                | inactive                            | after `APP_BACKGROUND_GRACE_MS` → `ended(app_background)`       |
+| play   | **held**                                     | untouched                | inactive                            | after grace → `ended(app_background)`, scene paused immediately |
+| drift  | **held**                                     | untouched                | inactive                            | after grace → `ended(app_background)`                           |
+| fade   | **held** until ended                         | `FADE_BRIGHTNESS_TARGET` | inactive                            | → `ended(fade)` immediately (they fell asleep)                  |
+| listen | **released** (`LISTEN_HOLD_WAKE_LOCK=false`) | `BRIGHTNESS_MIN`         | **active**                          | continue; nothing changes                                       |
+| ended  | released                                     | restore                  | deactivate after `stopAll` resolves | —                                                               |
 
-- **Grace handling:** on background, the Director records `backgroundedAt` and the runtime writes a *provisional* `SessionSummary` (`app_background`, `endedAt = backgroundedAt`). If the app returns within the grace period, the session continues and the provisional summary is deleted. Otherwise `reconcile()` finalizes it. If the app is killed, the provisional record is already correct.
+- **Grace handling:** on background, the Director records `backgroundedAt` and the runtime writes a _provisional_ `SessionSummary` (`app_background`, `endedAt = backgroundedAt`). If the app returns within the grace period, the session continues and the provisional summary is deleted. Otherwise `reconcile()` finalizes it. If the app is killed, the provisional record is already correct.
 - **Listen releases the wake lock** so the OS can turn the screen off, which saves battery and heat. The black, minimum-brightness screen covers the seconds before the OS auto-locks. **[VALIDATE]** with real users: some may expect the screen to stay on.
 
 ---
@@ -207,36 +207,36 @@ The hardest platform risk is **audio continuing, fading and speaking words while
 
 ### 2.1 Spec §18 open questions
 
-| # | Question | Decision (default to build against) | Needs validation? |
-|---|---|---|---|
-| 1 | iOS: native audio plugin, or `HTMLAudioElement` + Media Session? | **Neither as primary.** Use Capacitor iOS with `UIBackgroundModes=audio`, `AVAudioSession` category `.playback` set in `AppDelegate`, plus `navigator.audioSession.type = 'playback'` from JS, plus a **Web Audio graph with pre-scheduled listen timeline** (§1.8). Fallback order: `element-bridge` output, then `@capgo/capacitor-native-audio`. `navigator.mediaSession` metadata is set for lock-screen display on every platform. | **[VALIDATE] M0 on device, the central M0 question.** |
-| 2 | Drowsiness weights and thresholds | **Keep the spec values unchanged.** I prototyped the §6.1 algorithm against synthetic fixtures (Appendix A). With the fixture parameters in Appendix A, all five §6.3 expectations hold across 5–10 seeds. Caveat: `alertSteady` peaks around 0.27 against the 0.30 bound, so there is little margin. M3 adds `?debug=1` and local-only per-session sample logs so the values can be tuned later. | **[VALIDATE] real users, post-beta.** Tests pin fixture behavior, not real-world truth. |
-| 3 | Whisper voice: record in-house or hire a voice artist? | **Engineering does not block on this.** Recommend a hired Thai voice artist for consistency across about 150 words and future additions. In-house recording is fine for beta. Until real files exist, M1 uses **generated placeholder clips** (`scripts/gen-placeholder-voice.mjs`: soft filtered-noise bursts ≤1.2 s, one per word index) so gap and tail logic can be heard and tested. Recording spec for the artist: 48 kHz mono, ≤1.5 s, 30 ms fade-in / 80 ms fade-out, loudness-normalized to −30 LUFS integrated with −6 dBFS true peak, exported as AAC 96 kbps `.m4a`, file name `/voice/th/<index>.m4a` where index is the position in `words.th.json`. | Product-owner decision; not blocking. |
-| 4 | Tablet landscape: boats at the side or the bottom? | **Bottom, in both orientations.** Keeps one motor habit and one layout code path. The stream bezier (`stream.ts`) is defined in normalized 0..1 coordinates and fit to the viewport's aspect ratio, so landscape simply gets a longer, flatter stream. Phones lock to portrait at runtime (`@capacitor/screen-orientation` when the shortest side is < 600 dp, added in M2). Tablets rotate freely. | **[VALIDATE]** light usability check on one tablet in M2. |
+| #   | Question                                                         | Decision (default to build against)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Needs validation?                                                                       |
+| --- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| 1   | iOS: native audio plugin, or `HTMLAudioElement` + Media Session? | **Neither as primary.** Use Capacitor iOS with `UIBackgroundModes=audio`, `AVAudioSession` category `.playback` set in `AppDelegate`, plus `navigator.audioSession.type = 'playback'` from JS, plus a **Web Audio graph with pre-scheduled listen timeline** (§1.8). Fallback order: `element-bridge` output, then `@capgo/capacitor-native-audio`. `navigator.mediaSession` metadata is set for lock-screen display on every platform.                                                                                                                                                                                                                            | **[VALIDATE] M0 on device, the central M0 question.**                                   |
+| 2   | Drowsiness weights and thresholds                                | **Keep the spec values unchanged.** I prototyped the §6.1 algorithm against synthetic fixtures (Appendix A). With the fixture parameters in Appendix A, all five §6.3 expectations hold across 5–10 seeds. Caveat: `alertSteady` peaks around 0.27 against the 0.30 bound, so there is little margin. M3 adds `?debug=1` and local-only per-session sample logs so the values can be tuned later.                                                                                                                                                                                                                                                                  | **[VALIDATE] real users, post-beta.** Tests pin fixture behavior, not real-world truth. |
+| 3   | Whisper voice: record in-house or hire a voice artist?           | **Engineering does not block on this.** Recommend a hired Thai voice artist for consistency across about 150 words and future additions. In-house recording is fine for beta. Until real files exist, M1 uses **generated placeholder clips** (`scripts/gen-placeholder-voice.mjs`: soft filtered-noise bursts ≤1.2 s, one per word index) so gap and tail logic can be heard and tested. Recording spec for the artist: 48 kHz mono, ≤1.5 s, 30 ms fade-in / 80 ms fade-out, loudness-normalized to −30 LUFS integrated with −6 dBFS true peak, exported as AAC 96 kbps `.m4a`, file name `/voice/th/<index>.m4a` where index is the position in `words.th.json`. | Product-owner decision; not blocking.                                                   |
+| 4   | Tablet landscape: boats at the side or the bottom?               | **Bottom, in both orientations.** Keeps one motor habit and one layout code path. The stream bezier (`stream.ts`) is defined in normalized 0..1 coordinates and fit to the viewport's aspect ratio, so landscape simply gets a longer, flatter stream. Phones lock to portrait at runtime (`@capacitor/screen-orientation` when the shortest side is < 600 dp, added in M2). Tablets rotate freely.                                                                                                                                                                                                                                                                | **[VALIDATE]** light usability check on one tablet in M2.                               |
 
 ### 2.2 Implicit questions
 
-| Topic | Decision | Rationale |
-|---|---|---|
-| **Brightness plugin** | `@capacitor-community/screen-brightness@^8.0.0` | Maintained and supports Capacitor 8. API: `setBrightness({brightness})` / `getBrightness()`. **Behavior difference:** iOS sets **system** brightness (`UIScreen.main.brightness`), which persists after the app leaves. Android sets the **window** brightness, and `-1` restores the user setting. Our Capacitor Platform must capture the original on iOS and restore on background, `dispose` and `ended`. |
-| **Wake lock plugin** | `@capacitor-community/keep-awake@^8.0.1` (`keepAwake`/`allowSleep`/`isKeptAwake`). Web uses the Screen Wake Lock API, re-acquired on `visibilitychange → visible` while wanted. **No NoSleep.js-style video hack.** | The hack wastes battery and is fragile. If the web API is absent, report `supported=false`. |
-| **Background audio (Android)** | `@capgo/capacitor-media-session@^8.0.32`. `setPlaybackState({playbackState:'playing'})` starts a `mediaPlayback` foreground service; `'none'` releases it when the app stops. | It is the maintained Capacitor 8 successor to the unmaintained `@jofr/capacitor-media-session` (last release 2024, Capacitor 6 only). Android needs a foreground service to survive Doze for 30+ minutes. |
-| **Background audio (iOS)** | No plugin. Native patch: Info.plist `UIBackgroundModes: [audio]` and `AppDelegate` `AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)`. JS: `navigator.audioSession.type = 'playback'` when available (WebKit 16.4+). | `.playback` also ignores the silent switch, which is the right behavior for a sleep app. |
-| **Lifecycle** | `@capacitor/app@^8.1.1` (`appStateChange`, `backButton`) on native. `visibilitychange`, `pagehide` and `pageshow` on web. | Standard. |
-| **No Android notification permission** | Do **not** request `POST_NOTIFICATIONS`. The foreground service runs without it, and on Android 13+ its notification is simply hidden from the shade. | Spec pillar 5 (no push notifications). Avoids a permission prompt that looks like one. |
-| **Brown noise** | **[DEVIATION]** The default is a pure function that pre-renders a `BROWN_NOISE_LOOP_S`-second seamless loop (leaky-integrated white noise, DC-blocked, equal-power crossfade at the seam) into an `AudioBuffer`, looped by `AudioBufferSourceNode`. The AudioWorklet version (loaded with Vite `?worker&url`) is implemented only in the spike, for comparison. Drop ScriptProcessor. | It costs nearly zero CPU (battery). It has no worklet-loading edge cases in WebViews. The same samples can be WAV-encoded for the spike's element baseline. A 30 s loop of noise has no audible repetition. |
-| **Audio file format** | **[DEVIATION]** AAC in `.m4a` only. No ogg. | AAC plays on iOS WebKit, Android WebView and Chrome. Two formats would double the asset pipeline for no gain. Encoding needs ffmpeg on the content-producer's machine, not in CI. |
-| **IndexedDB** | `idb@^8`. One `openAppDb(name = 'firefly-pond')` in `src/store/db.ts` with a typed `DBSchema`. Migrations are an ordered array `MIGRATIONS: Array<(db, tx) => void>`, where index `i` upgrades `i → i+1`. `upgrade(db, oldV, newV, tx)` runs `MIGRATIONS.slice(oldV, newV)`. **Create all five v1 stores in M1** (even those unused until M4) so no pre-release migration is needed. Tests use `fake-indexeddb/auto`. Repositories (`src/store/repositories.ts`) are the only code touching `db`, and they take `Clock` for timestamps and retention purges. | Keeps the schema stable across milestones. Migrations are testable as plain functions. |
-| **Session IDs** | `crypto.randomUUID()` wrapped in an injected `ids: () => string` | Deterministic in tests. |
-| **Randomness** | **[ADDITION]** `Rng` interface injected like `Clock`. `seededRng(seed)` is mulberry32. `Math.random` is lint-banned outside `rng.ts`. | Spawn choice, respawn delay, shuffle gaps, word choice and visitor chance must all be reproducible in tests. |
-| **State management / routing** | No Pinia, no vue-router (§1.7). | Small app driven by a state machine. |
-| **Pixi renderer** | WebGL preference, `maxFPS` 30 in play and 20 in drift, DPR capped at 2. | Spec §8 performance. |
-| **Fonts** | Self-host **IBM Plex Sans Thai Looped** (OFL), weights 300/400, as `.woff2` in `public/fonts/`, 18 px minimum. Never load from a CDN. | A soft, highly legible looped Thai face. Self-hosting keeps the app offline and sends no third-party requests. **[VALIDATE]** visually in M2; swapping the font is a CSS-only change. |
-| **Privacy guard** | A build-only Content-Security-Policy `<meta>` (injected by a tiny Vite plugin with `apply: 'build'`, so dev HMR still works): `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'`. | Spec §0 says no data leaves the device. CSP makes an accidental network call fail loudly. `'self'` covers `capacitor://localhost` (iOS) and `https://localhost` (Android). |
-| **Minimum OS targets** | iOS 16.4+, Android 10+ (API 29) with Android System WebView 120+. All APIs are feature-detected, with no hard OS checks. | 16.4 is the first iOS with Screen Wake Lock and `navigator.audioSession` (partial). |
-| **App identity** | `appId: 'app.fireflypond.dev'` (placeholder) and `appName: 'Firefly Pond'`. The Thai display name `บึงหิ่งห้อย` is added through native localization in M5. | The final bundle ID must be the product owner's reverse domain before store upload. A non-ASCII `appName` risks tooling friction in generated project files. |
-| **PWA service worker** | **None in M0.** A static `public/manifest.webmanifest` (`display: standalone`, theme and background `#0B0806`, icons) plus the Apple meta tags is enough for Add to Home Screen testing. Add `vite-plugin-pwa` only if M0 selects PWA-only. | Offline support doesn't matter to the audio test. Keeps M0 lean. |
-| **Home → listen by user choice** | **[ADDITION to spec §5.1]** Add a transition `home → listen` via a "ฟังอย่างเดียว" (listen only) button on Home, reason `listen_only`. | M1 builds Listen mode before Play exists, so listen needs an entry point. Being able to just listen is also a reasonable feature. **Product-owner sign-off needed.** If rejected, keep it behind `?debug=1`. |
+| Topic                                  | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Rationale                                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Brightness plugin**                  | `@capacitor-community/screen-brightness@^8.0.0`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Maintained and supports Capacitor 8. API: `setBrightness({brightness})` / `getBrightness()`. **Behavior difference:** iOS sets **system** brightness (`UIScreen.main.brightness`), which persists after the app leaves. Android sets the **window** brightness, and `-1` restores the user setting. Our Capacitor Platform must capture the original on iOS and restore on background, `dispose` and `ended`. |
+| **Wake lock plugin**                   | `@capacitor-community/keep-awake@^8.0.1` (`keepAwake`/`allowSleep`/`isKeptAwake`). Web uses the Screen Wake Lock API, re-acquired on `visibilitychange → visible` while wanted. **No NoSleep.js-style video hack.**                                                                                                                                                                                                                                                                                                                                          | The hack wastes battery and is fragile. If the web API is absent, report `supported=false`.                                                                                                                                                                                                                                                                                                                   |
+| **Background audio (Android)**         | `@capgo/capacitor-media-session@^8.0.32`. `setPlaybackState({playbackState:'playing'})` starts a `mediaPlayback` foreground service; `'none'` releases it when the app stops.                                                                                                                                                                                                                                                                                                                                                                                | It is the maintained Capacitor 8 successor to the unmaintained `@jofr/capacitor-media-session` (last release 2024, Capacitor 6 only). Android needs a foreground service to survive Doze for 30+ minutes.                                                                                                                                                                                                     |
+| **Background audio (iOS)**             | No plugin. Native patch: Info.plist `UIBackgroundModes: [audio]` and `AppDelegate` `AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)`. JS: `navigator.audioSession.type = 'playback'` when available (WebKit 16.4+).                                                                                                                                                                                                                                                                                                                   | `.playback` also ignores the silent switch, which is the right behavior for a sleep app.                                                                                                                                                                                                                                                                                                                      |
+| **Lifecycle**                          | `@capacitor/app@^8.1.1` (`appStateChange`, `backButton`) on native. `visibilitychange`, `pagehide` and `pageshow` on web.                                                                                                                                                                                                                                                                                                                                                                                                                                    | Standard.                                                                                                                                                                                                                                                                                                                                                                                                     |
+| **No Android notification permission** | Do **not** request `POST_NOTIFICATIONS`. The foreground service runs without it, and on Android 13+ its notification is simply hidden from the shade.                                                                                                                                                                                                                                                                                                                                                                                                        | Spec pillar 5 (no push notifications). Avoids a permission prompt that looks like one.                                                                                                                                                                                                                                                                                                                        |
+| **Brown noise**                        | **[DEVIATION]** The default is a pure function that pre-renders a `BROWN_NOISE_LOOP_S`-second seamless loop (leaky-integrated white noise, DC-blocked, equal-power crossfade at the seam) into an `AudioBuffer`, looped by `AudioBufferSourceNode`. The AudioWorklet version (loaded with Vite `?worker&url`) is implemented only in the spike, for comparison. Drop ScriptProcessor.                                                                                                                                                                        | It costs nearly zero CPU (battery). It has no worklet-loading edge cases in WebViews. The same samples can be WAV-encoded for the spike's element baseline. A 30 s loop of noise has no audible repetition.                                                                                                                                                                                                   |
+| **Audio file format**                  | **[DEVIATION]** AAC in `.m4a` only. No ogg.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | AAC plays on iOS WebKit, Android WebView and Chrome. Two formats would double the asset pipeline for no gain. Encoding needs ffmpeg on the content-producer's machine, not in CI.                                                                                                                                                                                                                             |
+| **IndexedDB**                          | `idb@^8`. One `openAppDb(name = 'firefly-pond')` in `src/store/db.ts` with a typed `DBSchema`. Migrations are an ordered array `MIGRATIONS: Array<(db, tx) => void>`, where index `i` upgrades `i → i+1`. `upgrade(db, oldV, newV, tx)` runs `MIGRATIONS.slice(oldV, newV)`. **Create all five v1 stores in M1** (even those unused until M4) so no pre-release migration is needed. Tests use `fake-indexeddb/auto`. Repositories (`src/store/repositories.ts`) are the only code touching `db`, and they take `Clock` for timestamps and retention purges. | Keeps the schema stable across milestones. Migrations are testable as plain functions.                                                                                                                                                                                                                                                                                                                        |
+| **Session IDs**                        | `crypto.randomUUID()` wrapped in an injected `ids: () => string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Deterministic in tests.                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Randomness**                         | **[ADDITION]** `Rng` interface injected like `Clock`. `seededRng(seed)` is mulberry32. `Math.random` is lint-banned outside `rng.ts`.                                                                                                                                                                                                                                                                                                                                                                                                                        | Spawn choice, respawn delay, shuffle gaps, word choice and visitor chance must all be reproducible in tests.                                                                                                                                                                                                                                                                                                  |
+| **State management / routing**         | No Pinia, no vue-router (§1.7).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Small app driven by a state machine.                                                                                                                                                                                                                                                                                                                                                                          |
+| **Pixi renderer**                      | WebGL preference, `maxFPS` 30 in play and 20 in drift, DPR capped at 2.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Spec §8 performance.                                                                                                                                                                                                                                                                                                                                                                                          |
+| **Fonts**                              | Self-host **IBM Plex Sans Thai Looped** (OFL), weights 300/400, as `.woff2` in `public/fonts/`, 18 px minimum. Never load from a CDN.                                                                                                                                                                                                                                                                                                                                                                                                                        | A soft, highly legible looped Thai face. Self-hosting keeps the app offline and sends no third-party requests. **[VALIDATE]** visually in M2; swapping the font is a CSS-only change.                                                                                                                                                                                                                         |
+| **Privacy guard**                      | A build-only Content-Security-Policy `<meta>` (injected by a tiny Vite plugin with `apply: 'build'`, so dev HMR still works): `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'`.                                                                                                                                                                                  | Spec §0 says no data leaves the device. CSP makes an accidental network call fail loudly. `'self'` covers `capacitor://localhost` (iOS) and `https://localhost` (Android).                                                                                                                                                                                                                                    |
+| **Minimum OS targets**                 | iOS 16.4+, Android 10+ (API 29) with Android System WebView 120+. All APIs are feature-detected, with no hard OS checks.                                                                                                                                                                                                                                                                                                                                                                                                                                     | 16.4 is the first iOS with Screen Wake Lock and `navigator.audioSession` (partial).                                                                                                                                                                                                                                                                                                                           |
+| **App identity**                       | `appId: 'app.fireflypond.dev'` (placeholder) and `appName: 'Firefly Pond'`. The Thai display name `บึงหิ่งห้อย` is added through native localization in M5.                                                                                                                                                                                                                                                                                                                                                                                                  | The final bundle ID must be the product owner's reverse domain before store upload. A non-ASCII `appName` risks tooling friction in generated project files.                                                                                                                                                                                                                                                  |
+| **PWA service worker**                 | **None in M0.** A static `public/manifest.webmanifest` (`display: standalone`, theme and background `#0B0806`, icons) plus the Apple meta tags is enough for Add to Home Screen testing. Add `vite-plugin-pwa` only if M0 selects PWA-only.                                                                                                                                                                                                                                                                                                                  | Offline support doesn't matter to the audio test. Keeps M0 lean.                                                                                                                                                                                                                                                                                                                                              |
+| **Home → listen by user choice**       | **[ADDITION to spec §5.1]** Add a transition `home → listen` via a "ฟังอย่างเดียว" (listen only) button on Home, reason `listen_only`.                                                                                                                                                                                                                                                                                                                                                                                                                       | M1 builds Listen mode before Play exists, so listen needs an entry point. Being able to just listen is also a reasonable feature. **Product-owner sign-off needed.** If rejected, keep it behind `?debug=1`.                                                                                                                                                                                                  |
 
 ---
 
@@ -248,40 +248,40 @@ Versions are the current majors on npm as of 2026-09-24. Use caret ranges except
 
 **dependencies**
 
-| Package | Range | Why |
-|---|---|---|
-| `vue` | `^3.5.43` | UI shell (spec) |
-| `pixi.js` | `^8.21.0` | Scene (spec). Installed in M0 so the toolchain is settled once; first used in M2. |
-| `idb` | `^8.0.3` | IndexedDB (spec) |
-| `@capacitor/core` | `^8.5.2` | Native bridge |
-| `@capacitor/app` | `^8.1.1` | Lifecycle and back button |
-| `@capacitor/ios`, `@capacitor/android` | `^8.5.2` | Native platforms |
-| `@capacitor-community/screen-brightness` | `^8.0.0` | Brightness |
-| `@capacitor-community/keep-awake` | `^8.0.1` | Wake lock |
-| `@capgo/capacitor-media-session` | `^8.0.32` | Android background-audio foreground service and lock-screen metadata |
+| Package                                  | Range     | Why                                                                               |
+| ---------------------------------------- | --------- | --------------------------------------------------------------------------------- |
+| `vue`                                    | `^3.5.43` | UI shell (spec)                                                                   |
+| `pixi.js`                                | `^8.21.0` | Scene (spec). Installed in M0 so the toolchain is settled once; first used in M2. |
+| `idb`                                    | `^8.0.3`  | IndexedDB (spec)                                                                  |
+| `@capacitor/core`                        | `^8.5.2`  | Native bridge                                                                     |
+| `@capacitor/app`                         | `^8.1.1`  | Lifecycle and back button                                                         |
+| `@capacitor/ios`, `@capacitor/android`   | `^8.5.2`  | Native platforms                                                                  |
+| `@capacitor-community/screen-brightness` | `^8.0.0`  | Brightness                                                                        |
+| `@capacitor-community/keep-awake`        | `^8.0.1`  | Wake lock                                                                         |
+| `@capgo/capacitor-media-session`         | `^8.0.32` | Android background-audio foreground service and lock-screen metadata              |
 
 **devDependencies**
 
-| Package | Range | Why |
-|---|---|---|
-| `typescript` | **`~6.0.3`** | Pinned: `typescript-eslint@8.70` requires `<6.1.0`. **Do not use TS 7.** |
-| `vue-tsc` | `^3.3.11` | Type-checks `.vue` files |
-| `vite` | `^8.3.0` | Build |
-| `@vitejs/plugin-vue` | `^6.0.9` | SFCs |
-| `@capacitor/cli` | `^8.5.2` | `cap add/sync/open` |
-| `vitest`, `@vitest/coverage-v8` | `^5.0.1` | Unit tests |
-| `jsdom` | `^30.1.1` | DOM environment for component and web-platform tests, opted in per file |
-| `@vue/test-utils` | `^2.5.1` | Component tests |
-| `fake-indexeddb` | `^6.2.5` | Store tests (M1+). Install now. |
-| `@playwright/test` | `^1.63.0` | E2E |
-| `eslint` | `^10.11.0` | Lint |
-| `@eslint/js` | `^10.0.1` | Base rules |
-| `typescript-eslint` | `^8.70.1` | TS rules, type-aware |
-| `eslint-plugin-vue` | `^10.11.1` | Vue rules (bundles `vue-eslint-parser`) |
-| `eslint-config-prettier` | `^10.1.8` | Disables conflicting stylistic rules |
-| `globals` | `^17.12.0` | Browser and node globals for flat config |
-| `prettier` | `^3.9.9` | Format |
-| `@types/node` | `^22` | Match the Node 22 runtime, for config files and scripts |
+| Package                         | Range        | Why                                                                      |
+| ------------------------------- | ------------ | ------------------------------------------------------------------------ |
+| `typescript`                    | **`~6.0.3`** | Pinned: `typescript-eslint@8.70` requires `<6.1.0`. **Do not use TS 7.** |
+| `vue-tsc`                       | `^3.3.11`    | Type-checks `.vue` files                                                 |
+| `vite`                          | `^8.3.0`     | Build                                                                    |
+| `@vitejs/plugin-vue`            | `^6.0.9`     | SFCs                                                                     |
+| `@capacitor/cli`                | `^8.5.2`     | `cap add/sync/open`                                                      |
+| `vitest`, `@vitest/coverage-v8` | `^5.0.1`     | Unit tests                                                               |
+| `jsdom`                         | `^30.1.1`    | DOM environment for component and web-platform tests, opted in per file  |
+| `@vue/test-utils`               | `^2.5.1`     | Component tests                                                          |
+| `fake-indexeddb`                | `^6.2.5`     | Store tests (M1+). Install now.                                          |
+| `@playwright/test`              | `^1.63.0`    | E2E                                                                      |
+| `eslint`                        | `^10.11.0`   | Lint                                                                     |
+| `@eslint/js`                    | `^10.0.1`    | Base rules                                                               |
+| `typescript-eslint`             | `^8.70.1`    | TS rules, type-aware                                                     |
+| `eslint-plugin-vue`             | `^10.11.1`   | Vue rules (bundles `vue-eslint-parser`)                                  |
+| `eslint-config-prettier`        | `^10.1.8`    | Disables conflicting stylistic rules                                     |
+| `globals`                       | `^17.12.0`   | Browser and node globals for flat config                                 |
+| `prettier`                      | `^3.9.9`     | Format                                                                   |
+| `@types/node`                   | `^22`        | Match the Node 22 runtime, for config files and scripts                  |
 
 Do not add zod, lodash, pinia, vue-router, howler, tone.js or any analytics or crash SDK.
 
@@ -306,7 +306,7 @@ Do not add zod, lodash, pinia, vue-router, howler, tone.js or any analytics or c
   "cap:sync": "npm run build && cap sync",
   "cap:ios": "cap open ios",
   "cap:android": "cap open android",
-  "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && vite build"
+  "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && vite build",
 }
 ```
 
@@ -341,7 +341,7 @@ Shared `compilerOptions` (put these in a `tsconfig.base.json` and extend it):
   "resolveJsonModule": true,
   "skipLibCheck": true,
   "noEmit": true,
-  "tsBuildInfoFile": "./node_modules/.tmp/<name>.tsbuildinfo"
+  "tsBuildInfoFile": "./node_modules/.tmp/<name>.tsbuildinfo",
 }
 ```
 
@@ -350,6 +350,7 @@ Shared `compilerOptions` (put these in a `tsconfig.base.json` and extend it):
 ### 3.4 Vite, Vitest and Playwright config
 
 **`vite.config.ts`**
+
 - `base: './'` makes paths relative, so the same `dist/` works in Capacitor and on any HTTPS subpath. Content JSON keeps the spec's absolute-looking paths (`/dreams/whale.svg`), resolved through `assetUrl(p)` = `import.meta.env.BASE_URL + p.replace(/^\//, '')`.
 - Multi-page input: `index.html` (app) and `spike.html` (M0 spike). Use `build.rollupOptions.input`; if Vite 8 logs a deprecation, rename it to `build.rolldownOptions`.
 - `build.target: 'es2022'`.
@@ -357,11 +358,13 @@ Shared `compilerOptions` (put these in a `tsconfig.base.json` and extend it):
 - `define: { __BUILD_ID__: JSON.stringify(<git short sha or timestamp>) }`, shown on the spike page so device logs can be matched to builds.
 
 **`vitest.config.ts`**
+
 - First line: `process.env.TZ = 'Asia/Bangkok';`
 - `mergeConfig(viteConfig, defineConfig({ test: { environment: 'node', include: ['tests/unit/**/*.test.ts'], setupFiles: ['tests/setup.ts'], restoreMocks: true, coverage: { provider: 'v8', include: ['src/core/**', 'src/platform/**', 'src/audio/**', 'src/store/**'], thresholds: { 'src/core/**': { lines: 90, branches: 85 } } } } }))`
 - DOM tests opt in with a `// @vitest-environment jsdom` file header.
 
 **`playwright.config.ts`**
+
 - `testDir: 'tests/e2e'`. `webServer: { command: 'npm run build && npm run preview', port: 4173, reuseExistingServer: !process.env.CI }`.
 - Projects:
   - `mobile-chromium` (**required**): `browserName: 'chromium'`, `viewport: { width: 390, height: 844 }`, `deviceScaleFactor: 3`, `isMobile: true`, `hasTouch: true`, `launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] }`
@@ -370,22 +373,23 @@ Shared `compilerOptions` (put these in a `tsconfig.base.json` and extend it):
 ### 3.5 ESLint and Prettier
 
 **`eslint.config.ts`** (flat config), in this order:
+
 1. Global ignores: `dist`, `coverage`, `android`, `ios`, `playwright-report`, `test-results`, `public`.
 2. `@eslint/js` recommended.
 3. `tseslint.configs.strictTypeChecked` with `parserOptions: { projectService: true, extraFileExtensions: ['.vue'] }`.
 4. `pluginVue.configs['flat/recommended']` with `languageOptions.parserOptions.parser = tseslint.parser` for `*.vue`.
 5. **Project guard rules**:
 
-| Files | Rule | Purpose |
-|---|---|---|
-| `src/**` except `src/core/clock.ts`, `src/core/rng.ts`, `src/platform/**`, `src/spike/**` | `no-restricted-globals`: `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`, `requestAnimationFrame`; `no-restricted-properties`: `Date.now`, `performance.now`, `Math.random`, `window.setTimeout`, `window.setInterval`, `globalThis.setTimeout` | Spec §0 Clock rule, plus Rng |
-| `src/**` except `src/platform/**` | `no-restricted-imports` patterns: `@capacitor/*`, `@capacitor-community/*`, `@capgo/*` | Spec §0 Platform rule |
-| `src/core/**` | `no-restricted-imports`: `vue`, `pixi.js`, `idb`, `**/ui/**`, `**/scene/**`, `**/audio/**`, `**/platform/**`, `**/store/**`, `**/app/**` | Keeps core pure |
-| `src/**` except `src/scene/**`, `src/ui/screens/Pond.vue` | `no-restricted-imports`: `pixi.js` | Keeps Pixi contained |
-| `src/**` | `no-restricted-syntax`: `TSEnumDeclaration` | No enums |
-| `src/core/**`, `src/audio/**` except `src/core/config.ts` | `@typescript-eslint/no-magic-numbers` with `ignore: [-1, 0, 1, 2, 100, 1000, 60000]`, `ignoreArrayIndexes: true`, `ignoreDefaultValues: false` | Spec §0: tunables live in config |
-| all TS | `@typescript-eslint/no-floating-promises: error`, `@typescript-eslint/consistent-type-imports: error` | Audio and platform are promise-heavy |
-| `tests/**` | Relax the restriction rules and `no-magic-numbers` | Tests may use fixtures and literals |
+| Files                                                                                     | Rule                                                                                                                                                                                                                                                         | Purpose                              |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
+| `src/**` except `src/core/clock.ts`, `src/core/rng.ts`, `src/platform/**`, `src/spike/**` | `no-restricted-globals`: `setTimeout`, `setInterval`, `clearTimeout`, `clearInterval`, `requestAnimationFrame`; `no-restricted-properties`: `Date.now`, `performance.now`, `Math.random`, `window.setTimeout`, `window.setInterval`, `globalThis.setTimeout` | Spec §0 Clock rule, plus Rng         |
+| `src/**` except `src/platform/**`                                                         | `no-restricted-imports` patterns: `@capacitor/*`, `@capacitor-community/*`, `@capgo/*`                                                                                                                                                                       | Spec §0 Platform rule                |
+| `src/core/**`                                                                             | `no-restricted-imports`: `vue`, `pixi.js`, `idb`, `**/ui/**`, `**/scene/**`, `**/audio/**`, `**/platform/**`, `**/store/**`, `**/app/**`                                                                                                                     | Keeps core pure                      |
+| `src/**` except `src/scene/**`, `src/ui/screens/Pond.vue`                                 | `no-restricted-imports`: `pixi.js`                                                                                                                                                                                                                           | Keeps Pixi contained                 |
+| `src/**`                                                                                  | `no-restricted-syntax`: `TSEnumDeclaration`                                                                                                                                                                                                                  | No enums                             |
+| `src/core/**`, `src/audio/**` except `src/core/config.ts`                                 | `@typescript-eslint/no-magic-numbers` with `ignore: [-1, 0, 1, 2, 100, 1000, 60000]`, `ignoreArrayIndexes: true`, `ignoreDefaultValues: false`                                                                                                               | Spec §0: tunables live in config     |
+| all TS                                                                                    | `@typescript-eslint/no-floating-promises: error`, `@typescript-eslint/consistent-type-imports: error`                                                                                                                                                        | Audio and platform are promise-heavy |
+| `tests/**`                                                                                | Relax the restriction rules and `no-magic-numbers`                                                                                                                                                                                                           | Tests may use fixtures and literals  |
 
 6. `eslint-config-prettier` last.
 
@@ -468,7 +472,9 @@ export interface Clock {
   clearInterval(id: TimerId): void;
 }
 
-export class RealClock implements Clock { /* thin wrappers over globalThis timers + Date.now */ }
+export class RealClock implements Clock {
+  /* thin wrappers over globalThis timers + Date.now */
+}
 
 /**
  * Deterministic clock for tests.
@@ -505,9 +511,11 @@ export class FakeClock implements Clock {
 ### 4.2 Rng (`src/core/rng.ts`)
 
 ```ts
-export interface Rng { /** Uniform in [0, 1). */ next(): number; }
-export function seededRng(seed: number): Rng;           // mulberry32
-export const systemRng: Rng;                             // wraps Math.random (the only allowed use)
+export interface Rng {
+  /** Uniform in [0, 1). */ next(): number;
+}
+export function seededRng(seed: number): Rng; // mulberry32
+export const systemRng: Rng; // wraps Math.random (the only allowed use)
 export function randRange(rng: Rng, [min, max]: readonly [number, number]): number;
 export function randInt(rng: Rng, min: number, maxInclusive: number): number;
 /** Picks an index not in `recent` (a ring of the last N picks); falls back to any index if all excluded. */
@@ -523,32 +531,45 @@ export class EventBus<M extends object> {
   constructor(opts?: { onError?: (err: unknown, type: keyof M) => void });
   on<K extends keyof M>(type: K, fn: (payload: M[K]) => void): Unsubscribe;
   once<K extends keyof M>(type: K, fn: (payload: M[K]) => void): Unsubscribe;
-  emit<K extends keyof M>(type: K, payload: M[K]): void;   // sync, subscription order
+  emit<K extends keyof M>(type: K, payload: M[K]): void; // sync, subscription order
   listenerCount(type?: keyof M): number;
   clear(): void;
 }
 
 export type TransitionReason =
-  | 'start' | 'night_wake' | 'listen_only'                  // from home
-  | 'jar_closed' | 'settle_skipped'                         // settle → play
-  | 'drowsy' | 'play_max'                                   // play → drift
-  | 'listen_button' | 'listen_offer' | 'gentle_exit_listen' // → listen
-  | 'idle'                                                  // play/drift → fade
-  | 'fade_complete' | 'listen_timer'                        // → ended
-  | 'user_exit' | 'app_background';                         // → ended
+  | 'start'
+  | 'night_wake'
+  | 'listen_only' // from home
+  | 'jar_closed'
+  | 'settle_skipped' // settle → play
+  | 'drowsy'
+  | 'play_max' // play → drift
+  | 'listen_button'
+  | 'listen_offer'
+  | 'gentle_exit_listen' // → listen
+  | 'idle' // play/drift → fade
+  | 'fade_complete'
+  | 'listen_timer' // → ended
+  | 'user_exit'
+  | 'app_background'; // → ended
 
 export interface AppEvents {
-  'session:started':    { at: number; sessionId: string; nightWake: boolean };
-  'phase:changed':      { at: number; from: Phase; to: Phase; reason: TransitionReason;
-                          listenDurationMs?: number };       // present iff to === 'listen'
-  'tap:recorded':       { at: number; tap: TapEvent };
-  'drowsiness:sample':  { at: number; sample: DrowsinessSample };
-  'ui:listenOffer':     { at: number };                      // once per session
-  'ui:gentleExit':      { at: number };                      // once per session
-  'listen:extended':    { at: number; newEndsAt: number };
-  'app:lifecycle':      { at: number; state: LifecycleState };
-  'scene:starEarned':   { at: number; golden: boolean };     // M2
-  'session:ended':      { at: number; summary: SessionSummary };
+  'session:started': { at: number; sessionId: string; nightWake: boolean };
+  'phase:changed': {
+    at: number;
+    from: Phase;
+    to: Phase;
+    reason: TransitionReason;
+    listenDurationMs?: number;
+  }; // present iff to === 'listen'
+  'tap:recorded': { at: number; tap: TapEvent };
+  'drowsiness:sample': { at: number; sample: DrowsinessSample };
+  'ui:listenOffer': { at: number }; // once per session
+  'ui:gentleExit': { at: number }; // once per session
+  'listen:extended': { at: number; newEndsAt: number };
+  'app:lifecycle': { at: number; state: LifecycleState };
+  'scene:starEarned': { at: number; golden: boolean }; // M2
+  'session:ended': { at: number; summary: SessionSummary };
 }
 ```
 
@@ -561,7 +582,7 @@ export type LifecycleState = 'active' | 'background';
 export interface PlatformInfo {
   readonly kind: PlatformKind;
   readonly isNative: boolean;
-  readonly isStandalonePwa: boolean;    // display-mode: standalone || navigator.standalone
+  readonly isStandalonePwa: boolean; // display-mode: standalone || navigator.standalone
   readonly userAgent: string;
 }
 
@@ -584,7 +605,12 @@ export interface WakeLockControl {
   release(): Promise<void>;
 }
 
-export interface NowPlayingMeta { title: string; artist?: string; album?: string; artworkUrl?: string }
+export interface NowPlayingMeta {
+  title: string;
+  artist?: string;
+  album?: string;
+  artworkUrl?: string;
+}
 export type RemoteCommand = 'play' | 'pause' | 'stop';
 
 export interface BackgroundAudioControl {
@@ -616,12 +642,13 @@ export interface Platform {
 }
 
 export interface PlatformOptions {
-  force?: 'web';                         // also set by ?platform=web
-  log?: (msg: string) => void;           // diagnostics sink (the spike wires it into its log)
+  force?: 'web'; // also set by ?platform=web
+  log?: (msg: string) => void; // diagnostics sink (the spike wires it into its log)
 }
 ```
 
 `src/platform/index.ts`:
+
 ```ts
 export async function createPlatform(opts?: PlatformOptions): Promise<Platform> {
   // force web if opts.force === 'web' or URL has ?platform=web
@@ -632,13 +659,13 @@ export async function createPlatform(opts?: PlatformOptions): Promise<Platform> 
 
 **Implementation notes**
 
-| Capability | `web.ts` | `capacitor.ts` |
-|---|---|---|
-| brightness | `supported=false`; `get → null`; `set`/`restore` no-ops | `ScreenBrightness`. On first `set` after a restore, capture `original = get()`. `restore`: iOS sets `original`; Android sets `-1`. Subscribe to lifecycle: **background → restore the original but keep the target; active → re-apply the target if one is set.** |
-| wakeLock | `navigator.wakeLock.request('screen')`. Track `wanted`. On the sentinel's `release` event set `held=false`. On `visibilitychange → visible` with `wanted`, re-request. `supported = 'wakeLock' in navigator`. | `KeepAwake.keepAwake()` / `allowSleep()`; `supported` from `isSupported()` (cached at creation). |
+| Capability      | `web.ts`                                                                                                                                                                                                           | `capacitor.ts`                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| brightness      | `supported=false`; `get → null`; `set`/`restore` no-ops                                                                                                                                                            | `ScreenBrightness`. On first `set` after a restore, capture `original = get()`. `restore`: iOS sets `original`; Android sets `-1`. Subscribe to lifecycle: **background → restore the original but keep the target; active → re-apply the target if one is set.**                                                                                                                                                      |
+| wakeLock        | `navigator.wakeLock.request('screen')`. Track `wanted`. On the sentinel's `release` event set `held=false`. On `visibilitychange → visible` with `wanted`, re-request. `supported = 'wakeLock' in navigator`.      | `KeepAwake.keepAwake()` / `allowSleep()`; `supported` from `isSupported()` (cached at creation).                                                                                                                                                                                                                                                                                                                       |
 | backgroundAudio | mode `'web-media-session'` if `'mediaSession' in navigator`, else `'none'`. `activate`: set `navigator.mediaSession.metadata`, `playbackState='playing'`, and `navigator.audioSession.type='playback'` if present. | iOS: same as web (WKWebView exposes mediaSession and audioSession). The native category comes from the AppDelegate patch. Mode is `'web-media-session'`. Android: `MediaSession.setMetadata`, then `setPlaybackState({playbackState:'playing'})`, which starts the FGS. `deactivate` sets `'none'`. Mode is `'native-session'`. Register `setActionHandler` for play/pause/stop and forward them to `onRemoteCommand`. |
-| lifecycle | `document.visibilityState` plus `visibilitychange`, `pagehide` (→ background) and `pageshow` (→ active) | `App.addListener('appStateChange', ({isActive}) => …)`. Initial state from `App.getState()`. |
-| back button | no-op | `App.addListener('backButton', …)` |
+| lifecycle       | `document.visibilityState` plus `visibilitychange`, `pagehide` (→ background) and `pageshow` (→ active)                                                                                                            | `App.addListener('appStateChange', ({isActive}) => …)`. Initial state from `App.getState()`.                                                                                                                                                                                                                                                                                                                           |
+| back button     | no-op                                                                                                                                                                                                              | `App.addListener('backButton', …)`                                                                                                                                                                                                                                                                                                                                                                                     |
 
 Type `navigator.audioSession` in `src/env.d.ts` (`interface Navigator { audioSession?: { type: 'auto' | 'playback' | 'transient' | 'transient-solo' | 'ambient' | 'play-and-record' } }`).
 
@@ -648,9 +675,17 @@ Copy spec §4 verbatim (`Phase`, `EndReason`, `DreamColor`, `DreamDef`, `TapEven
 
 ```ts
 export type FeatureKey = 'rtMedian' | 'itiMedian' | 'itiCv' | 'missRate';
-export interface FeatureStats { mean: number; std: number }
-export type Baseline = Record<FeatureKey, FeatureStats> & { source: 'measured' | 'default' | 'mixed' };
-export interface LastSessionInfo { endedAt: number; endReason: EndReason }
+export interface FeatureStats {
+  mean: number;
+  std: number;
+}
+export type Baseline = Record<FeatureKey, FeatureStats> & {
+  source: 'measured' | 'default' | 'mixed';
+};
+export interface LastSessionInfo {
+  endedAt: number;
+  endReason: EndReason;
+}
 ```
 
 `WindowFeatures` fields may be undefined when a window lacks data. **[DEVIATION]** Change the spec's `number` to `number | null` for `itiMedian`, `itiCv` and `rtMedian` (see Appendix A for when each is null). `missRate` and `tapCount` are always defined when `tapCount > 0`.
@@ -661,20 +696,20 @@ export interface LastSessionInfo { endedAt: number; endReason: EndReason }
 // src/core/drowsiness/DrowsinessEstimator.ts: spec §6.2 API, unchanged
 class DrowsinessEstimator {
   constructor(clock: Clock, cfg: DrowsinessConfig);
-  startBaseline(): void;            // baseline window starts at clock.now()
-  record(e: TapEvent): void;        // e.t must be clock time; out-of-order events are ignored
-  tick(): DrowsinessSample | null;  // null until baseline ready
-  get score(): number;              // 0 before the first sample
+  startBaseline(): void; // baseline window starts at clock.now()
+  record(e: TapEvent): void; // e.t must be clock time; out-of-order events are ignored
+  tick(): DrowsinessSample | null; // null until baseline ready
+  get score(): number; // 0 before the first sample
   get isBaselineReady(): boolean;
-  get baseline(): Baseline | null;  // [ADDITION] for the debug overlay
+  get baseline(): Baseline | null; // [ADDITION] for the debug overlay
   reset(): void;
 }
 
 // src/core/nightwake/NightWakeDetector.ts: pure
 class NightWakeDetector {
   constructor(clock: Clock, cfg: NightWakeConfig);
-  isNightWake(last: LastSessionInfo | null): boolean;   // spec §10 formula, using localHour(clock.now())
-  isRevealWindow(): boolean;                            // REVEAL_START_HOUR <= hour < NIGHT_START_HOUR
+  isNightWake(last: LastSessionInfo | null): boolean; // spec §10 formula, using localHour(clock.now())
+  isRevealWindow(): boolean; // REVEAL_START_HOUR <= hour < NIGHT_START_HOUR
 }
 
 // src/core/pacing/PacingController.ts: no Clock needed (time arrives as input); stateful only for continuity
@@ -682,15 +717,15 @@ interface PacingInput {
   phase: Phase;
   now: number;
   phaseEnteredAt: number;
-  playElapsedMs: number;            // time spent in 'play' only
-  drowsinessScore: number;          // M2 passes 0 (time-only pacing)
+  playElapsedMs: number; // time spent in 'play' only
+  drowsinessScore: number; // M2 passes 0 (time-only pacing)
   lastTapAt: number | null;
-  voicePreference: boolean;         // settings
+  voicePreference: boolean; // settings
 }
 class PacingController {
   constructor(cfg: PacingConfig);
   /** Captures dimAlpha/masterVolume at each phase change, so drift/fade ramps start from where play left off. */
-  update(input: PacingInput): PacingOutput;   // PacingOutput per spec §7
+  update(input: PacingInput): PacingOutput; // PacingOutput per spec §7
   reset(): void;
 }
 
@@ -708,8 +743,8 @@ interface DirectorSnapshot {
   phase: Phase;
   phaseEnteredAt: number;
   sessionStartedAt: number | null;
-  playElapsedMs: number;            // play phase only (PLAY_MAX_MS, PLAY_CURVE_MS)
-  activeElapsedMs: number;          // play + drift (LISTEN_OFFER_MS, GENTLE_EXIT_MS)
+  playElapsedMs: number; // play phase only (PLAY_MAX_MS, PLAY_CURVE_MS)
+  activeElapsedMs: number; // play + drift (LISTEN_OFFER_MS, GENTLE_EXIT_MS)
   lastTapAt: number | null;
   drowsinessScore: number;
   nightWake: boolean;
@@ -724,17 +759,17 @@ class SessionDirector {
   snapshot(): DirectorSnapshot;
   // commands
   start(ctx: { lastSession: LastSessionInfo | null; listenDurationMs: number }): void; // home → settle | listen(night_wake)
-  startListenOnly(listenDurationMs: number): void;                                     // home → listen (listen_only) [ADDITION]
+  startListenOnly(listenDurationMs: number): void; // home → listen (listen_only) [ADDITION]
   completeSettle(how: 'jar_closed' | 'settle_skipped'): void;
-  tap(e: Omit<TapEvent, 't'>): void;                     // stamps t = clock.now(); resets idle timer; feeds estimator in play/drift
+  tap(e: Omit<TapEvent, 't'>): void; // stamps t = clock.now(); resets idle timer; feeds estimator in play/drift
   starEarned(golden: boolean): void;
   requestListen(reason: 'listen_button' | 'listen_offer', listenDurationMs: number): void;
   gentleExitChoice(choice: 'listen' | 'continue' | 'rest', listenDurationMs: number): void;
   extendListen(ms: number): void;
-  exit(): void;                                          // any phase → ended(user_exit)
-  appLifecycle(state: LifecycleState): void;             // grace logic per §1.9
-  reconcile(): void;                                     // re-check all deadlines vs clock.now()
-  dispose(): void;                                       // clears all timers
+  exit(): void; // any phase → ended(user_exit)
+  appLifecycle(state: LifecycleState): void; // grace logic per §1.9
+  reconcile(): void; // re-check all deadlines vs clock.now()
+  dispose(): void; // clears all timers
 }
 ```
 
@@ -744,12 +779,19 @@ class SessionDirector {
 // src/audio/AudioEngine.ts: spec §9.3 public API unchanged; extra deps in a 4th param [ADDITION]
 interface AudioEngineDeps {
   rng: Rng;
-  createContext: () => AudioContextLike;       // real: () => new AudioContext({ latencyHint: 'playback' })
+  createContext: () => AudioContextLike; // real: () => new AudioContext({ latencyHint: 'playback' })
   loadBuffer: (url: string, ctx: AudioContextLike) => Promise<AudioBuffer>;
-  outputKind: AudioOutputKind;                 // from CONFIG.audio.OUTPUT_STRATEGY[platform.info.kind]
-  words: readonly string[];                    // words.th.json
+  outputKind: AudioOutputKind; // from CONFIG.audio.OUTPUT_STRATEGY[platform.info.kind]
+  words: readonly string[]; // words.th.json
 }
-class AudioEngine { constructor(clock: Clock, platform: Platform, cfg: AudioConfig, deps: AudioEngineDeps); /* spec API */ }
+class AudioEngine {
+  constructor(
+    clock: Clock,
+    platform: Platform,
+    cfg: AudioConfig,
+    deps: AudioEngineDeps,
+  ); /* spec API */
+}
 
 // src/audio/outputs/AudioOutput.ts
 type AudioOutputKind = 'webaudio-direct' | 'element-bridge';
@@ -832,16 +874,17 @@ Work in order and commit after each numbered step (small commits make device bis
 
 #### 5.B.1 Setup: the four build variants
 
-| Variant | How |
-|---|---|
-| **iOS PWA** | `npm run build && npm run preview`, then expose it over HTTPS (wake lock and audioSession require a secure context): `npx cloudflared tunnel --url http://localhost:4173` (no account needed), or deploy `dist/` to any static HTTPS host. Open in Safari, then Share → Add to Home Screen, then launch from the home screen icon. **Test the home-screen app, not the Safari tab.** |
-| **iOS Capacitor** | On a Mac with current Xcode: `npm ci && npm run cap:sync && npm run cap:ios`. Set a signing team and run on the device. If `ios/` wasn't generated in the sandbox, first run `npx cap add ios` and apply the §5.A step 14 iOS patch. |
-| **Android PWA** | Same HTTPS URL in Chrome, then ⋮ → Add to Home screen / Install app, then launch from the icon. |
-| **Android Capacitor** | Android Studio with JDK 21: `npm ci && npm run cap:sync && npm run cap:android`, then run on a USB-debugging device. |
+| Variant               | How                                                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **iOS PWA**           | `npm run build && npm run preview`, then expose it over HTTPS (wake lock and audioSession require a secure context): `npx cloudflared tunnel --url http://localhost:4173` (no account needed), or deploy `dist/` to any static HTTPS host. Open in Safari, then Share → Add to Home Screen, then launch from the home screen icon. **Test the home-screen app, not the Safari tab.** |
+| **iOS Capacitor**     | On a Mac with current Xcode: `npm ci && npm run cap:sync && npm run cap:ios`. Set a signing team and run on the device. If `ios/` wasn't generated in the sandbox, first run `npx cap add ios` and apply the §5.A step 14 iOS patch.                                                                                                                                                 |
+| **Android PWA**       | Same HTTPS URL in Chrome, then ⋮ → Add to Home screen / Install app, then launch from the icon.                                                                                                                                                                                                                                                                                      |
+| **Android Capacitor** | Android Studio with JDK 21: `npm ci && npm run cap:sync && npm run cap:android`, then run on a USB-debugging device.                                                                                                                                                                                                                                                                 |
 
 Record for each device: model, OS version, WebView/Safari version (shown on the spike page), and the build ID (shown on the spike page).
 
 **Device preconditions for every audio test:**
+
 - battery ≥ 60% and **unplugged**;
 - Low Power Mode / Battery Saver **off** (run one extra A1 with it **on** for the winning strategy);
 - media volume 50%, no headphones (repeat once with Bluetooth headphones if available);
@@ -925,6 +968,7 @@ Plain, dark and warm (`#0B0806` background, `#C98A3E` text, buttons at least 48 
 These are guardrails, not full plans. Each milestone gets its own planning pass.
 
 ### M1: Listen mode
+
 - Build `SessionDirector` with **only** the listen-related rows first (home→listen via `listen_only` and `night_wake`, listen→ended via `listen_timer`/`user_exit`, extend, lifecycle and reconcile). Write the tests for those rows **before** the implementation (spec §0). Add the other rows in M3.
 - `AudioEngine` per §1.8 and §4.6: pre-scheduled listen timeline, `FakeAudioContext`-based tests of the timeline (word gaps within `[MIN,MAX]` and ×1.5 in the tail, no repeats within 30, silence in the final `LISTEN_TAIL_MS`, master reaching 0 exactly at the end).
 - `src/store/db.ts`: **all five v1 stores**, the migration array, and a **provisional summary** written at listen start with `endReason: 'listen_timer'` and the projected `endedAt`, updated on extend or exit. If JS is frozen at the deadline, the record is already correct.
@@ -933,6 +977,7 @@ These are guardrails, not full plans. Each milestone gets its own planning pass.
 - Placeholder voice clips (§2.1 Q3) and a starter `words.th.json` (about 150 words, content-validated by a unit test: unique, non-empty, Thai script only).
 
 ### M2: Play core loop
+
 - Split the scene: `scene/model/*` is pure (Clock plus Rng, no Pixi) and holds dream spawning with `NO_REPEAT_WINDOW`, the respawn queue, boats and capacity, star creation, and breath phase. `scene/entities/*` are Pixi views that render model state each frame. **All M2 rules are unit-tested at model level.** Pixi code stays thin.
 - `stream.ts` is normalized-coordinate bezier data plus `fitToViewport(w, h)`, with bottom-edge boats in both orientations (§2.1 Q4). Add the runtime portrait lock for phones.
 - `PacingController` with `drowsinessScore = 0` (time-only) per M2. Tests cover progress, easing, `spawnIntervalMs`, and dimAlpha continuity across phase changes.
@@ -942,6 +987,7 @@ These are guardrails, not full plans. Each milestone gets its own planning pass.
 - Debug overlay component (`?debug=1`) scaffolded here and filled in during M3.
 
 ### M3: Drowsiness, drift and fade
+
 - Write the fixtures (Appendix A) and the estimator and director tests **first**, then the implementation.
 - Director: every §5.1 row gets at least one test, plus gentle-exit-shown-once, listen offer, background grace (using `FakeClock.jump`), and `reconcile`.
 - 90-minute accelerated simulation test: run the Director and Estimator on each fixture and snapshot `[phase, reason, minute]` paths with `toMatchInlineSnapshot`.
@@ -949,17 +995,20 @@ These are guardrails, not full plans. Each milestone gets its own planning pass.
 - Local-only drowsiness sample log per session (in memory, dumped into the debug overlay export), to support the tuning in §2.1 Q2. Not persisted by default.
 
 ### M4: Settle, night wake and meta
+
 - Jar: enforce `JAR_MAX_ITEMS` and `JAR_MAX_CHARS`; retention purge on app start through `repositories.purgeOldJars(clock)`. Jar text never enters the export or logs.
 - `NightWakeDetector` wired into `start()`. Visitor reveal gated by `isRevealWindow()` and the night-wake flag. Morning survey gated by hours and "had a session last night".
 - `moon.ts`: pure phase from date, with tests against known new and full moon dates.
 - Onboarding is one question (sleep latency bucket) stored in `settings`.
 
 ### M5: Metrics and beta
+
 - The "สถิติของฉัน" (my stats) page is computed from the `sessions` store only.
 - Export JSON is opt-in and user-initiated. Add `platform.shareFile(name, text)` to `Platform` (Capacitor: `@capacitor/filesystem` plus `@capacitor/share`; web: Blob download). The export excludes jar contents (enforced by a test). There are still no network calls, and the CSP stays.
 - Release hygiene: final `appId`; Thai display name through native localization; icons and splash via `@capacitor/assets`; remove the spike from release builds (`VITE_INCLUDE_SPIKE` unset and a build-time check that `spike.html` is absent from `dist/`); TestFlight and Play internal testing.
 
 ### Choices in M0 that deliberately keep later milestones open
+
 - `Platform` capability groups are extensible: M5 adds `shareFile` without touching the existing groups.
 - The `AudioOutput` strategy decouples M0's findings from the M1 API.
 - Epoch-ms Clock plus `reconcile()` supports listen timers across device sleep (M1) and background grace (M3).
@@ -991,17 +1040,18 @@ The spec leaves several computation details open, and test outcomes depend on th
    - `raw = 1 / (1 + e^−(Σ w_f z_f − BIAS))`.
 
 **Fixtures** (`tests/fixtures/tapStreams.ts`). Each is a function of `(seed: number)` built on `seededRng` plus Box–Muller gaussians (`tests/helpers/gaussian.ts`).
+
 - ITIs are clamped to ≥ 250 ms and RTs to ≥ 150 ms.
 - A tap with `hit=false` has no `reactionMs`.
 - **Tests run each fixture for seeds 1–5 and every seed must pass.** No cherry-picking a lucky seed.
 
-| Fixture | Parameters (m = minutes since play start) | Prototype result (Python, same algorithm and spec config) |
-|---|---|---|
-| `alertSteady` | 25 min. ITI ~ N(2000, 300). RT ~ N(850, 150). **Deterministic** miss on every 12th tap. | max score 0.18–0.27 over 10 seeds; never drifts. **Thin margin to 0.30.** |
-| `graduallyDrowsy` | 25 min. k = clamp((m − 6)/14, 0, 1). ITI ~ N(2000+3000k, 350+1300k). RT ~ N(850+1300k, 180+320k). Miss probability 0.08+0.27k (random). | drift at 9.25–10.5 min over 10 seeds (spec: 8–14) |
-| `suddenStop` | `alertSteady` until 6:00, then no taps | Last tap ≈ 5:59, so the idle rule reaches fade at ≈ 6:44, before the no-tap window rule could force drift (which would need two ≥ 0.6 samples after 7:00) |
-| `noisy` | 25 min. Each ITI 50/50: fast N(1400,150) with RT N(850,200), or slow N(3200,300) with RT N(1100,200). Miss probability 0.10. | max score 0.17–0.42; never drifts |
-| `tooFewBaselineTaps` | 10 taps spread over 0–120 s, then `alertSteady` behavior | `baseline.source === 'default'`, no throw, `isBaselineReady === true` after 120 s |
+| Fixture              | Parameters (m = minutes since play start)                                                                                               | Prototype result (Python, same algorithm and spec config)                                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `alertSteady`        | 25 min. ITI ~ N(2000, 300). RT ~ N(850, 150). **Deterministic** miss on every 12th tap.                                                 | max score 0.18–0.27 over 10 seeds; never drifts. **Thin margin to 0.30.**                                                                                 |
+| `graduallyDrowsy`    | 25 min. k = clamp((m − 6)/14, 0, 1). ITI ~ N(2000+3000k, 350+1300k). RT ~ N(850+1300k, 180+320k). Miss probability 0.08+0.27k (random). | drift at 9.25–10.5 min over 10 seeds (spec: 8–14)                                                                                                         |
+| `suddenStop`         | `alertSteady` until 6:00, then no taps                                                                                                  | Last tap ≈ 5:59, so the idle rule reaches fade at ≈ 6:44, before the no-tap window rule could force drift (which would need two ≥ 0.6 samples after 7:00) |
+| `noisy`              | 25 min. Each ITI 50/50: fast N(1400,150) with RT N(850,200), or slow N(3200,300) with RT N(1100,200). Miss probability 0.10.            | max score 0.17–0.42; never drifts                                                                                                                         |
+| `tooFewBaselineTaps` | 10 taps spread over 0–120 s, then `alertSteady` behavior                                                                                | `baseline.source === 'default'`, no throw, `isBaselineReady === true` after 120 s                                                                         |
 
 **Test assertion for `noisy`** (the spec's "ไม่สลับ phase ไปมา" / "doesn't flip phases back and forth", made concrete): the phase path is a prefix of `play → drift → fade` with no repeated phase, **and** no `drowsy`-reason drift occurs before `PLAY_MAX_MS`.
 

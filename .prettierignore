@@ -1,0 +1,9 @@
+dist
+coverage
+android
+ios
+playwright-report
+test-results
+public
+node_modules
+package-lock.json
