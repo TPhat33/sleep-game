@@ -35,7 +35,7 @@ export default defineConfig(
         tsconfigRootDir: import.meta.dirname,
         extraFileExtensions: ['.vue'],
       },
-      globals: { ...globals.browser, ...globals.node },
+      globals: { ...globals.browser, ...globals.node, __BUILD_ID__: 'readonly' },
     },
   },
   ...pluginVue.configs['flat/recommended'],
