@@ -1,0 +1,42 @@
+[
+  { "id": "whale", "nameTh": "ปลาวาฬ", "color": "amber", "sprite": "/dreams/whale.svg" },
+  { "id": "umbrella", "nameTh": "ร่ม", "color": "amber", "sprite": "/dreams/umbrella.svg" },
+  { "id": "lantern", "nameTh": "โคมไฟ", "color": "amber", "sprite": "/dreams/lantern.svg" },
+  { "id": "key", "nameTh": "กุญแจ", "color": "amber", "sprite": "/dreams/key.svg" },
+  { "id": "teapot", "nameTh": "กาน้ำชา", "color": "amber", "sprite": "/dreams/teapot.svg" },
+  { "id": "seashell", "nameTh": "เปลือกหอย", "color": "amber", "sprite": "/dreams/seashell.svg" },
+  { "id": "kite", "nameTh": "ว่าว", "color": "amber", "sprite": "/dreams/kite.svg" },
+  { "id": "compass", "nameTh": "เข็มทิศ", "color": "amber", "sprite": "/dreams/compass.svg" },
+  { "id": "feather", "nameTh": "ขนนก", "color": "amber", "sprite": "/dreams/feather.svg" },
+  { "id": "honeycomb", "nameTh": "รังผึ้ง", "color": "amber", "sprite": "/dreams/honeycomb.svg" },
+  { "id": "mountain", "nameTh": "ภูเขา", "color": "ember", "sprite": "/dreams/mountain.svg" },
+  { "id": "acorn", "nameTh": "ลูกโอ๊ก", "color": "ember", "sprite": "/dreams/acorn.svg" },
+  { "id": "drum", "nameTh": "กลอง", "color": "ember", "sprite": "/dreams/drum.svg" },
+  {
+    "id": "maple-leaf",
+    "nameTh": "ใบเมเปิล",
+    "color": "ember",
+    "sprite": "/dreams/maple-leaf.svg"
+  },
+  { "id": "clay-pot", "nameTh": "หม้อดิน", "color": "ember", "sprite": "/dreams/clay-pot.svg" },
+  { "id": "basket", "nameTh": "ตะกร้า", "color": "ember", "sprite": "/dreams/basket.svg" },
+  { "id": "bell", "nameTh": "กระดิ่ง", "color": "ember", "sprite": "/dreams/bell.svg" },
+  { "id": "pinecone", "nameTh": "ลูกสน", "color": "ember", "sprite": "/dreams/pinecone.svg" },
+  {
+    "id": "wooden-boat",
+    "nameTh": "เรือไม้",
+    "color": "ember",
+    "sprite": "/dreams/wooden-boat.svg"
+  },
+  { "id": "brick", "nameTh": "อิฐ", "color": "ember", "sprite": "/dreams/brick.svg" },
+  { "id": "turtle", "nameTh": "เต่า", "color": "moss", "sprite": "/dreams/turtle.svg" },
+  { "id": "fern", "nameTh": "เฟิร์น", "color": "moss", "sprite": "/dreams/fern.svg" },
+  { "id": "mushroom", "nameTh": "เห็ด", "color": "moss", "sprite": "/dreams/mushroom.svg" },
+  { "id": "lotus", "nameTh": "ดอกบัว", "color": "moss", "sprite": "/dreams/lotus.svg" },
+  { "id": "snail", "nameTh": "หอยทาก", "color": "moss", "sprite": "/dreams/snail.svg" },
+  { "id": "moss-stone", "nameTh": "หินมอส", "color": "moss", "sprite": "/dreams/moss-stone.svg" },
+  { "id": "bamboo", "nameTh": "ไผ่", "color": "moss", "sprite": "/dreams/bamboo.svg" },
+  { "id": "frog", "nameTh": "กบ", "color": "moss", "sprite": "/dreams/frog.svg" },
+  { "id": "dewdrop", "nameTh": "หยดน้ำค้าง", "color": "moss", "sprite": "/dreams/dewdrop.svg" },
+  { "id": "cricket", "nameTh": "จิ้งหรีด", "color": "moss", "sprite": "/dreams/cricket.svg" }
+]

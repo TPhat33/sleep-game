@@ -84,3 +84,23 @@ export type AudioOutputKind = 'webaudio-direct' | 'element-bridge';
 
 /** The ambient "bed" layers a player can pick from (spec §9.1) — voice and breathCue are separate toggles. */
 export type BedLayerId = 'rain' | 'crickets' | 'brownNoise' | 'asmrTaps';
+
+/** Normalized 0..1 position within the sky, spec §11/§15. */
+export interface StarPosition {
+  x: number;
+  y: number;
+}
+
+/** `constellations.json` (spec §11, §15): `stars.length === CONFIG.meta.STARS_PER_CONSTELLATION`. */
+export interface ConstellationDef {
+  id: string;
+  nameTh: string;
+  stars: readonly StarPosition[];
+}
+
+/** `visitors.json` (spec §11, §15). */
+export interface VisitorDef {
+  id: string;
+  nameTh: string;
+  sprite: string;
+}

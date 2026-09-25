@@ -1,0 +1,10 @@
+[
+  { "id": "moth", "nameTh": "ผีเสื้อกลางคืน", "sprite": "/visitors/moth.svg" },
+  { "id": "owl", "nameTh": "นกฮูก", "sprite": "/visitors/owl.svg" },
+  { "id": "deer", "nameTh": "กวาง", "sprite": "/visitors/deer.svg" },
+  { "id": "raccoon", "nameTh": "แรคคูน", "sprite": "/visitors/raccoon.svg" },
+  { "id": "hedgehog", "nameTh": "เม่นแคระ", "sprite": "/visitors/hedgehog.svg" },
+  { "id": "heron", "nameTh": "นกกระสา", "sprite": "/visitors/heron.svg" },
+  { "id": "rabbit", "nameTh": "กระต่ายป่า", "sprite": "/visitors/rabbit.svg" },
+  { "id": "otter", "nameTh": "นาก", "sprite": "/visitors/otter.svg" }
+]
