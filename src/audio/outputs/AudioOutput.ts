@@ -27,7 +27,7 @@ export interface GainNodeLike extends AudioNodeLike {
 export interface AudioBufferSourceNodeLike extends AudioNodeLike {
   buffer: AudioBuffer | null;
   loop: boolean;
-  onended: (() => void) | null;
+  onended: ((ev: Event) => void) | null;
   start(when?: number): void;
   stop(when?: number): void;
 }
@@ -36,7 +36,10 @@ export interface MediaStreamDestinationLike extends AudioNodeLike {
   readonly stream: MediaStream;
 }
 
-export type AudioContextState = 'suspended' | 'running' | 'closed';
+// 'interrupted' is a newer WebKit/Safari state (an OS-level audio
+// interruption, e.g. a phone call) not yet in every lib.dom.d.ts version;
+// included so the real browser AudioContext satisfies this type as-is.
+export type AudioContextState = 'suspended' | 'running' | 'closed' | 'interrupted';
 
 export interface AudioContextLike {
   readonly currentTime: number;
