@@ -15,6 +15,7 @@ import type { SessionDirector } from '../core/session/SessionDirector';
 import type { Platform } from '../platform/Platform';
 import type { Repositories } from '../store/repositories';
 import type { SessionRuntime } from './SessionRuntime';
+import type { VisitorReveal } from './VisitorReveal';
 
 export interface Services {
   clock: Clock;
@@ -30,6 +31,8 @@ export interface Services {
   audioEngine: AudioEngine;
   /** Not read directly by the UI — held so its bus subscriptions (plan §1.9) stay alive for the app's lifetime. */
   sessionRuntime: SessionRuntime;
+  /** Not read directly by the UI — held so its 'session:ended' subscription (spec §11) stays alive. */
+  visitorReveal: VisitorReveal;
 }
 
 export const ServicesKey: InjectionKey<Services> = Symbol('services');

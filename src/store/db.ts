@@ -105,7 +105,12 @@ export function openAppDb(name: string = DB_NAME): Promise<IDBPDatabase<FireflyP
 }
 
 export const DEFAULT_SETTINGS: SettingsRecord = {
-  enabledLayers: ['rain'],
+  // [ADDITION] brownNoise is the only bed layer synthesized in-process
+  // (AudioEngine + renderBrownNoise) rather than loaded from a file, so
+  // it has no asset-loading dependency at all — the safest default while
+  // rain/crickets/asmrTaps are still placeholder audio (scripts/gen-
+  // placeholder-audio.mjs), not real recorded content.
+  enabledLayers: ['brownNoise'],
   voiceEnabled: true,
   breathCueEnabled: false,
   listenDefaultMinutes: 60,

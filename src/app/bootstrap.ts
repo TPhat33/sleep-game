@@ -14,10 +14,12 @@ import { PacingController } from '../core/pacing/PacingController';
 import { systemRng } from '../core/rng';
 import { SessionDirector } from '../core/session/SessionDirector';
 import { createPlatform } from '../platform';
+import visitors from '../content/visitors.json';
 import words from '../content/words.th.json';
 import { openAppDb } from '../store/db';
 import { Repositories } from '../store/repositories';
 import { SessionRuntime } from './SessionRuntime';
+import { VisitorReveal } from './VisitorReveal';
 import type { Services } from './services';
 
 function createAudioContext(): AudioContext {
@@ -65,6 +67,14 @@ export async function bootstrap(): Promise<Services> {
     cfg: { pacing: CONFIG.pacing, audio: CONFIG.audio },
   });
 
+  const visitorReveal = new VisitorReveal({
+    bus,
+    rng,
+    progress: repositories.progress,
+    visitors,
+    visitorChance: CONFIG.meta.VISITOR_CHANCE,
+  });
+
   return {
     clock,
     rng,
@@ -78,5 +88,6 @@ export async function bootstrap(): Promise<Services> {
     pacing,
     audioEngine,
     sessionRuntime,
+    visitorReveal,
   };
 }

@@ -196,5 +196,15 @@ export default defineConfig(
       'no-restricted-properties': 'off',
     },
   },
+  // spec §3's file tree names screens Home.vue, Pond.vue, Sky.vue, etc. —
+  // single words by design; they're routed by App.vue, never used as
+  // arbitrary custom elements, so the HTML-tag-clash this rule guards
+  // against doesn't apply here.
+  {
+    files: ['src/ui/screens/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
   prettierConfig,
 );

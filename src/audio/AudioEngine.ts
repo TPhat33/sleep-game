@@ -138,8 +138,20 @@ export class AudioEngine {
     }
     for (const layer of layers) {
       if (this.layerSources.has(layer)) continue;
-      void this.startBedLayer(layer, ctx, master);
+      void this.startBedLayer(layer, ctx, master).catch((err: unknown) => {
+        this.logLoadError(`bed layer "${layer}"`, err);
+      });
     }
+  }
+
+  /**
+   * Asset loads are fire-and-forget from every call site (setBed, playSfx,
+   * shuffle words, the listen timeline) — a missing/404 asset should never
+   * crash the session or surface as an unhandled rejection, just get
+   * logged and skipped.
+   */
+  private logLoadError(context: string, err: unknown): void {
+    console.error(`AudioEngine: ${context} failed to load:`, err);
   }
 
   private async startBedLayer(
@@ -175,15 +187,19 @@ export class AudioEngine {
     const gain = ctx.createGain();
     gain.gain.value = this.cfg.scene.SFX_MAX_GAIN;
     gain.connect(master);
-    void this.loadLayerBuffer(SFX_URLS[id], ctx).then((buffer) => {
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(gain);
-      source.onended = () => {
-        gain.disconnect();
-      };
-      source.start();
-    });
+    void this.loadLayerBuffer(SFX_URLS[id], ctx)
+      .then((buffer) => {
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(gain);
+        source.onended = () => {
+          gain.disconnect();
+        };
+        source.start();
+      })
+      .catch((err: unknown) => {
+        this.logLoadError(`sfx "${id}"`, err);
+      });
   }
 
   /** Live (non-pre-scheduled) shuffle voice, for use during 'drift' — spec §9.1. */
@@ -221,12 +237,16 @@ export class AudioEngine {
   private playWordNow(index: number): void {
     const { ctx, master } = this.requireCtx();
     const gain = this.layerGain('shuffleVoice', master, ctx);
-    void this.loadLayerBuffer(voiceWordUrl(index), ctx).then((buffer) => {
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(gain);
-      source.start();
-    });
+    void this.loadLayerBuffer(voiceWordUrl(index), ctx)
+      .then((buffer) => {
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(gain);
+        source.start();
+      })
+      .catch((err: unknown) => {
+        this.logLoadError(`shuffle word #${String(index)}`, err);
+      });
   }
 
   /**
@@ -259,12 +279,16 @@ export class AudioEngine {
     );
     const gain = this.layerGain('shuffleVoice', master, ctx);
     for (const event of schedule) {
-      void this.loadLayerBuffer(voiceWordUrl(event.wordIndex), ctx).then((buffer) => {
-        const source = ctx.createBufferSource();
-        source.buffer = buffer;
-        source.connect(gain);
-        source.start(startTime + event.atMs / MS_PER_S);
-      });
+      void this.loadLayerBuffer(voiceWordUrl(event.wordIndex), ctx)
+        .then((buffer) => {
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(gain);
+          source.start(startTime + event.atMs / MS_PER_S);
+        })
+        .catch((err: unknown) => {
+          this.logLoadError(`listen word #${String(event.wordIndex)}`, err);
+        });
     }
   }
 
