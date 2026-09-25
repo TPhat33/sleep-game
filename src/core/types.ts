@@ -81,3 +81,6 @@ export interface LastSessionInfo {
 export type LifecycleState = 'active' | 'background';
 export type PlatformKind = 'web' | 'ios' | 'android';
 export type AudioOutputKind = 'webaudio-direct' | 'element-bridge';
+
+/** The ambient "bed" layers a player can pick from (spec §9.1) — voice and breathCue are separate toggles. */
+export type BedLayerId = 'rain' | 'crickets' | 'brownNoise' | 'asmrTaps';
