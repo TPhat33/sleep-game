@@ -4,12 +4,14 @@ import { onMounted, ref } from 'vue';
 import { CONFIG } from '../../core/config';
 import type { BedLayerId } from '../../core/types';
 import type { SettingsRecord } from '../../store/db';
+import { buildExportPayload } from '../../store/exportData';
 import { useServices } from '../composables/useServices';
 
 defineEmits<{ back: [] }>();
 
 const services = useServices();
 const settings = ref<SettingsRecord | null>(null);
+const exporting = ref(false);
 
 const LAYER_LABELS: Record<BedLayerId, string> = {
   rain: 'เสียงฝน',
@@ -48,6 +50,29 @@ async function toggleBreathCue(): Promise<void> {
 
 async function setListenMinutes(minutes: number): Promise<void> {
   settings.value = await services.repositories.settings.update({ listenDefaultMinutes: minutes });
+}
+
+async function toggleAnalyticsOptIn(): Promise<void> {
+  if (!settings.value) return;
+  settings.value = await services.repositories.settings.update({
+    analyticsOptIn: !settings.value.analyticsOptIn,
+  });
+}
+
+/** M5 opt-in export (spec §12): local sessions/progress/settings only — never the jar (store/exportData.ts). */
+async function exportData(): Promise<void> {
+  if (!settings.value || exporting.value) return;
+  exporting.value = true;
+  try {
+    const [progress, sessions] = await Promise.all([
+      services.repositories.progress.get(),
+      services.repositories.sessions.list(),
+    ]);
+    const payload = buildExportPayload(services.clock.now(), settings.value, progress, sessions);
+    await services.platform.shareFile('firefly-pond-export.json', JSON.stringify(payload, null, 2));
+  } finally {
+    exporting.value = false;
+  }
 }
 </script>
 
@@ -95,6 +120,23 @@ async function setListenMinutes(minutes: number): Promise<void> {
           {{ minutes }}
         </button>
       </div>
+    </section>
+
+    <section>
+      <p class="section-title">ข้อมูล</p>
+      <label class="row">
+        <input type="checkbox" :checked="settings.analyticsOptIn" @change="toggleAnalyticsOptIn" />
+        <span>อนุญาตให้ส่งออกข้อมูลสถิติได้</span>
+      </label>
+      <button
+        v-if="settings.analyticsOptIn"
+        type="button"
+        class="add"
+        :disabled="exporting"
+        @click="exportData"
+      >
+        ส่งออกข้อมูล (JSON)
+      </button>
     </section>
   </main>
 </template>

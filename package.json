@@ -22,10 +22,11 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "gen:spike-audio": "node scripts/gen-spike-audio.mjs",
+    "check:no-spike": "node scripts/check-no-spike.mjs",
     "cap:sync": "npm run build && cap sync",
     "cap:ios": "cap open ios",
     "cap:android": "cap open android",
-    "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && vite build"
+    "verify": "npm run typecheck && npm run lint && npm run format:check && npm run test && vite build && npm run check:no-spike"
   },
   "dependencies": {
     "@capacitor-community/keep-awake": "^8.0.1",
@@ -33,7 +34,9 @@
     "@capacitor/android": "^8.5.2",
     "@capacitor/app": "^8.1.1",
     "@capacitor/core": "^8.5.2",
+    "@capacitor/filesystem": "^8.1.3",
     "@capacitor/ios": "^8.5.2",
+    "@capacitor/share": "^8.0.2",
     "@capgo/capacitor-media-session": "^8.0.32",
     "idb": "^8.0.3",
     "pixi.js": "^8.21.0",

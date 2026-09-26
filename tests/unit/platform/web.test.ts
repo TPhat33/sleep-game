@@ -132,3 +132,44 @@ describe('createWebPlatform: dispose', () => {
     expect(sentinel.release).toHaveBeenCalled();
   });
 });
+
+describe('createWebPlatform: shareFile', () => {
+  it('triggers a Blob download via a temporary anchor, with no network call', async () => {
+    const createObjectURL = vi.fn<(blob: Blob) => string>(() => 'blob:fake-url');
+    const revokeObjectURL = vi.fn();
+    Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true });
+    Object.defineProperty(URL, 'revokeObjectURL', { value: revokeObjectURL, configurable: true });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {
+      /* jsdom has no real navigation; just record the call */
+    });
+
+    const platform = createWebPlatform();
+    await platform.shareFile('firefly-pond-export.json', '{"sessions":[]}');
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1);
+    const [blobArg] = createObjectURL.mock.calls[0] as [Blob];
+    expect(blobArg.type).toBe('application/json');
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:fake-url');
+
+    clickSpy.mockRestore();
+    Reflect.deleteProperty(URL, 'createObjectURL');
+    Reflect.deleteProperty(URL, 'revokeObjectURL');
+  });
+
+  it('logs rather than throws if the download fails to trigger', async () => {
+    const log = vi.fn();
+    Object.defineProperty(URL, 'createObjectURL', {
+      value: () => {
+        throw new Error('blocked');
+      },
+      configurable: true,
+    });
+
+    const platform = createWebPlatform({ log });
+    await expect(platform.shareFile('x.json', '{}')).resolves.toBeUndefined();
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('shareFile'));
+
+    Reflect.deleteProperty(URL, 'createObjectURL');
+  });
+});

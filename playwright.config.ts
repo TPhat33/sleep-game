@@ -8,7 +8,10 @@ const chromiumPath = process.env.PLAYWRIGHT_CHROMIUM_PATH;
 export default defineConfig({
   testDir: 'tests/e2e',
   webServer: {
-    command: 'npm run build && npm run preview',
+    // e2e still exercises the M0 platform spike (smoke.spec.ts), so this
+    // build explicitly opts back in — a *release* build (plain `npm run
+    // build`, VITE_INCLUDE_SPIKE unset) never ships it (plan §6 M5).
+    command: 'VITE_INCLUDE_SPIKE=1 npm run build && npm run preview',
     port: 4173,
     reuseExistingServer: !process.env.CI,
   },

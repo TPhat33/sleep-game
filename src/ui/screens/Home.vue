@@ -4,7 +4,7 @@ import { onMounted, ref } from 'vue';
 import type { LastSessionInfo } from '../../core/types';
 import { useServices } from '../composables/useServices';
 
-const emit = defineEmits<{ navigate: [tab: 'sky' | 'journal' | 'settings'] }>();
+const emit = defineEmits<{ navigate: [tab: 'sky' | 'journal' | 'settings' | 'stats'] }>();
 
 const services = useServices();
 const lastSession = ref<LastSessionInfo | null>(null);
@@ -52,6 +52,7 @@ async function listenOnly(): Promise<void> {
     <nav class="tabs">
       <button type="button" @click="emit('navigate', 'sky')">ท้องฟ้า</button>
       <button type="button" @click="emit('navigate', 'journal')">สมุดความฝัน</button>
+      <button type="button" @click="emit('navigate', 'stats')">สถิติของฉัน</button>
       <button type="button" @click="emit('navigate', 'settings')">ตั้งค่า</button>
     </nav>
   </main>

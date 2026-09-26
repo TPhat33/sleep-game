@@ -40,6 +40,18 @@ vi.mock('@capacitor/core', () => ({
   Capacitor: { getPlatform, isNativePlatform: () => true },
 }));
 
+const writeFile = vi.fn<(opts: { path: string; data: string }) => Promise<{ uri: string }>>();
+vi.mock('@capacitor/filesystem', () => ({
+  Filesystem: { writeFile },
+  Directory: { Cache: 'CACHE' },
+  Encoding: { UTF8: 'utf8' },
+}));
+
+const share = vi.fn<(opts: { url?: string; title?: string }) => Promise<void>>();
+vi.mock('@capacitor/share', () => ({
+  Share: { share },
+}));
+
 const { createCapacitorPlatform } = await import('@/platform/capacitor');
 
 interface AppStateChangeCall {
@@ -68,6 +80,8 @@ beforeEach(() => {
   appAddListener.mockImplementation(() =>
     Promise.resolve({ remove: vi.fn().mockResolvedValue(undefined) }),
   );
+  writeFile.mockResolvedValue({ uri: 'file:///cache/export.json' });
+  share.mockResolvedValue(undefined);
 });
 
 describe('createCapacitorPlatform: brightness (iOS)', () => {
@@ -162,5 +176,37 @@ describe('createCapacitorPlatform: remote commands (Android)', () => {
     stopHandler?.();
 
     expect(received).toEqual(['play', 'pause', 'stop']);
+  });
+});
+
+describe('createCapacitorPlatform: shareFile', () => {
+  it('writes the file to the cache directory, then shares its uri', async () => {
+    getPlatform.mockReturnValue('ios');
+    const platform = await createCapacitorPlatform();
+
+    await platform.shareFile('firefly-pond-export.json', '{"sessions":[]}');
+
+    expect(writeFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: 'firefly-pond-export.json',
+        data: '{"sessions":[]}',
+        directory: 'CACHE',
+        encoding: 'utf8',
+      }),
+    );
+    expect(share).toHaveBeenCalledWith(
+      expect.objectContaining({ url: 'file:///cache/export.json' }),
+    );
+  });
+
+  it('logs rather than throws when the native calls fail', async () => {
+    getPlatform.mockReturnValue('android');
+    writeFile.mockRejectedValue(new Error('disk full'));
+    const log = vi.fn();
+    const platform = await createCapacitorPlatform({ log });
+
+    await expect(platform.shareFile('x.json', '{}')).resolves.toBeUndefined();
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('shareFile'));
+    expect(share).not.toHaveBeenCalled();
   });
 });

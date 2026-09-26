@@ -16,8 +16,9 @@ import Pond from './screens/Pond.vue';
 import Settings from './screens/Settings.vue';
 import Settle from './screens/Settle.vue';
 import Sky from './screens/Sky.vue';
+import Stats from './screens/Stats.vue';
 
-type HomeTab = 'home' | 'sky' | 'journal' | 'settings';
+type HomeTab = 'home' | 'sky' | 'journal' | 'settings' | 'stats';
 
 const services = useServices();
 const director = useDirectorState(services);
@@ -70,6 +71,7 @@ function handleSurveyDone(): void {
       <Home v-if="homeTab === 'home'" @navigate="homeTab = $event" />
       <Sky v-else-if="homeTab === 'sky'" @back="homeTab = 'home'" />
       <Journal v-else-if="homeTab === 'journal'" @back="homeTab = 'home'" />
+      <Stats v-else-if="homeTab === 'stats'" @back="homeTab = 'home'" />
       <Settings v-else-if="homeTab === 'settings'" @back="homeTab = 'home'" />
     </template>
 

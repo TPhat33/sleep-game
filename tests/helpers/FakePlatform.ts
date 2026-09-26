@@ -22,6 +22,7 @@ export interface FakePlatformCall {
 
 export class FakePlatform implements Platform {
   readonly calls: FakePlatformCall[] = [];
+  readonly sharedFiles: { name: string; text: string }[] = [];
   readonly info: PlatformInfo;
   readonly brightness: BrightnessControl & { setSupported(v: boolean): void };
   readonly wakeLock: WakeLockControl & { setSupported(v: boolean): void };
@@ -42,6 +43,12 @@ export class FakePlatform implements Platform {
     this.wakeLock = this.makeWakeLock();
     this.backgroundAudio = this.makeBackgroundAudio(kind);
     this.lifecycle = this.makeLifecycle();
+  }
+
+  shareFile(name: string, text: string): Promise<void> {
+    this.calls.push({ method: 'shareFile', args: [name, text] });
+    this.sharedFiles.push({ name, text });
+    return Promise.resolve();
   }
 
   onBackButton(fn: () => void): Unsubscribe {

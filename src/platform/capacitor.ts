@@ -6,6 +6,8 @@ import { ScreenBrightness } from '@capacitor-community/screen-brightness';
 import { MediaSession } from '@capgo/capacitor-media-session';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 import type { Unsubscribe } from '../core/events';
 import type {
@@ -257,6 +259,22 @@ function androidBackgroundAudio(log: (msg: string) => void): BackgroundAudioCont
   };
 }
 
+function createShareFile(log: (msg: string) => void): Platform['shareFile'] {
+  return async (name: string, text: string): Promise<void> => {
+    try {
+      const { uri } = await Filesystem.writeFile({
+        path: name,
+        data: text,
+        directory: Directory.Cache,
+        encoding: Encoding.UTF8,
+      });
+      await Share.share({ url: uri, title: name });
+    } catch (err) {
+      log(`shareFile: failed: ${String(err)}`);
+    }
+  };
+}
+
 interface LifecycleWithDispose {
   lifecycle: LifecycleSource;
   dispose: () => Promise<void>;
@@ -297,6 +315,7 @@ export async function createCapacitorPlatform(opts?: PlatformOptions): Promise<P
   const brightness = createBrightness(kind, lifecycle, log);
   const wakeLock = createWakeLock(log);
   const backgroundAudio = kind === 'ios' ? iosBackgroundAudio(log) : androidBackgroundAudio(log);
+  const shareFile = createShareFile(log);
 
   const backButtonListeners = new Set<() => void>();
   const backButtonHandle = await App.addListener('backButton', () => {
@@ -311,6 +330,7 @@ export async function createCapacitorPlatform(opts?: PlatformOptions): Promise<P
     wakeLock,
     backgroundAudio,
     lifecycle,
+    shareFile,
     onBackButton(fn: () => void): Unsubscribe {
       backButtonListeners.add(fn);
       return () => {

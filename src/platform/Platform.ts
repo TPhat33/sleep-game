@@ -70,6 +70,12 @@ export interface Platform {
   readonly lifecycle: LifecycleSource;
   /** Android hardware back. Web: a no-op that returns a no-op Unsubscribe. */
   onBackButton(fn: () => void): Unsubscribe;
+  /**
+   * Offers a plain-text file to the OS share sheet (M5 opt-in JSON
+   * export, spec §12). `name` is a filename hint, e.g. 'firefly-pond-export.json'.
+   * Web: triggers a Blob download. No network call either way (spec §0).
+   */
+  shareFile(name: string, text: string): Promise<void>;
   /** Restore brightness, release wake lock, deactivate background audio, remove listeners. Idempotent. */
   dispose(): Promise<void>;
 }

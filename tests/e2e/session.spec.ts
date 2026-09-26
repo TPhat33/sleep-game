@@ -122,6 +122,12 @@ test.describe('Home navigation', () => {
     await page.getByRole('button', { name: '‹ กลับ' }).click();
     await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
 
+    await page.getByRole('button', { name: 'สถิติของฉัน' }).click();
+    await expect(page.getByRole('heading', { name: 'สถิติของฉัน' })).toBeVisible();
+    await expect(page.getByText('ยังไม่มีข้อมูลเซสชัน')).toBeVisible();
+    await page.getByRole('button', { name: '‹ กลับ' }).click();
+    await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
+
     expect(errors).toEqual([]);
   });
 
@@ -143,6 +149,31 @@ test.describe('Home navigation', () => {
     await page.getByRole('button', { name: 'ตั้งค่า' }).click();
     await expect(page.getByRole('checkbox').nth(1)).toBeChecked();
     await expect(page.getByRole('button', { name: '90', exact: true })).toHaveClass(/active/);
+
+    expect(errors).toEqual([]);
+  });
+
+  test('the opt-in export downloads a JSON file with no jar content', async ({ page }) => {
+    const errors = trackErrors(page);
+    await completeOnboarding(page);
+    await page.getByRole('button', { name: 'ตั้งค่า' }).click();
+
+    await expect(page.getByRole('button', { name: /ส่งออกข้อมูล/ })).not.toBeVisible();
+    await page.getByText('อนุญาตให้ส่งออกข้อมูลสถิติได้').click();
+
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: /ส่งออกข้อมูล/ }).click(),
+    ]);
+    expect(download.suggestedFilename()).toBe('firefly-pond-export.json');
+
+    const path = await download.path();
+    const text = path ? await import('node:fs').then((fs) => fs.readFileSync(path, 'utf8')) : '';
+    const parsed = JSON.parse(text) as Record<string, unknown>;
+    expect(Object.keys(parsed)).not.toContain('jar');
+    expect(parsed).toHaveProperty('settings');
+    expect(parsed).toHaveProperty('progress');
+    expect(parsed).toHaveProperty('sessions');
 
     expect(errors).toEqual([]);
   });

@@ -14,6 +14,13 @@ function buildId(): string {
   }
 }
 
+// Release hygiene (plan §6 M5): a production build only bundles spike.html
+// when VITE_INCLUDE_SPIKE=1 is explicitly set — unset (the default) means a
+// release build never ships the M0 platform-spike page at all. This only
+// affects `vite build`; `vite dev` serves spike.html on request regardless,
+// same as any other file in the project root.
+const includeSpike = process.env.VITE_INCLUDE_SPIKE === '1';
+
 export default defineConfig({
   base: './',
   plugins: [vue(), cspPlugin()],
@@ -30,7 +37,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
-        spike: fileURLToPath(new URL('./spike.html', import.meta.url)),
+        ...(includeSpike ? { spike: fileURLToPath(new URL('./spike.html', import.meta.url)) } : {}),
       },
     },
   },

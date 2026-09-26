@@ -226,12 +226,32 @@ function createLifecycle(): LifecycleSource {
   };
 }
 
+function createShareFile(log: (msg: string) => void): Platform['shareFile'] {
+  return (name: string, text: string): Promise<void> => {
+    try {
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = name;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      log(`shareFile: failed: ${String(err)}`);
+    }
+    return Promise.resolve();
+  };
+}
+
 export function createWebPlatform(opts?: PlatformOptions): Platform {
   const log = opts?.log ?? (() => undefined);
   const brightness = createBrightness();
   const wakeLock = createWakeLock(log);
   const backgroundAudio = createBackgroundAudio(log);
   const lifecycle = createLifecycle();
+  const shareFile = createShareFile(log);
   let disposed = false;
 
   return {
@@ -240,6 +260,7 @@ export function createWebPlatform(opts?: PlatformOptions): Platform {
     wakeLock,
     backgroundAudio,
     lifecycle,
+    shareFile,
     onBackButton(): Unsubscribe {
       return () => undefined;
     },
