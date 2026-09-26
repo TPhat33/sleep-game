@@ -49,13 +49,13 @@ async function dismissVisitor(): Promise<void> {
 <template>
   <main class="sky">
     <header>
-      <button type="button" class="back" @click="$emit('back')">‹ กลับ</button>
-      <h1>ท้องฟ้า</h1>
+      <button type="button" class="back" @click="$emit('back')">‹ Back</button>
+      <h1>Sky</h1>
     </header>
 
     <div v-if="revealedVisitor" class="visitor-card" @click="dismissVisitor">
-      <p class="visitor-label">แขกยามค่ำคืนนี้</p>
-      <p class="visitor-name">{{ revealedVisitor.nameTh }}</p>
+      <p class="visitor-label">Tonight's visitor</p>
+      <p class="visitor-name">{{ revealedVisitor.name }}</p>
     </div>
 
     <div class="constellations">
@@ -65,7 +65,7 @@ async function dismissVisitor(): Promise<void> {
         class="constellation"
         :class="{ complete: completed.has(c.id) }"
       >
-        <p class="name">{{ c.nameTh }}</p>
+        <p class="name">{{ c.name }}</p>
         <div class="stars-box">
           <span
             v-for="(star, index) in c.stars"

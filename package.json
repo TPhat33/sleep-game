@@ -1,7 +1,7 @@
 {
-  "name": "firefly-pond",
+  "name": "hushglow",
   "version": "0.1.0",
-  "description": "บึงหิ่งห้อย (Firefly Pond) — a relaxation game that helps players fall asleep",
+  "description": "Hushglow — a relaxation game that helps players fall asleep",
   "private": true,
   "type": "module",
   "engines": {

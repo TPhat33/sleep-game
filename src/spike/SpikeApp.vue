@@ -139,7 +139,7 @@ function onBrownNoiseModeChange(): void {
 async function onToggleBackgroundAudio(): Promise<void> {
   if (!platform.value) return;
   if (backgroundAudioActive.value) {
-    await platform.value.backgroundAudio.activate({ title: 'Firefly Pond — spike' });
+    await platform.value.backgroundAudio.activate({ title: 'Hushglow — spike' });
   } else {
     await platform.value.backgroundAudio.deactivate();
   }
@@ -241,7 +241,7 @@ function onClearLog(): void {
 
 <template>
   <main class="spike">
-    <h1>Firefly Pond — Platform Spike</h1>
+    <h1>Hushglow — Platform Spike</h1>
 
     <section class="panel">
       <h2>Info</h2>

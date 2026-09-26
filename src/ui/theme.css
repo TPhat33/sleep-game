@@ -9,7 +9,7 @@
   --color-gold: #f0c46a;
   --color-text-dim: #8a6a4a;
 
-  --font-thai: 'IBM Plex Sans Thai Looped', system-ui, sans-serif;
+  --font-primary: 'IBM Plex Sans', system-ui, sans-serif;
   --font-size-base: 18px;
 }
 
@@ -19,7 +19,7 @@ body {
   padding: 0;
   background: var(--color-bg-night);
   color: var(--color-amber);
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: var(--font-size-base);
   font-weight: 300;
   overscroll-behavior: none;

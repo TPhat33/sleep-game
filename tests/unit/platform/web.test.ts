@@ -95,14 +95,14 @@ describe('createWebPlatform: backgroundAudio', () => {
   it('activate sets audioSession.type when present and does not throw when absent', async () => {
     const platform = createWebPlatform();
     await expect(
-      platform.backgroundAudio.activate({ title: 'Firefly Pond' }),
+      platform.backgroundAudio.activate({ title: 'Hushglow' }),
     ).resolves.toBeUndefined();
 
     Object.defineProperty(navigator, 'audioSession', {
       value: { type: 'auto' },
       configurable: true,
     });
-    await platform.backgroundAudio.activate({ title: 'Firefly Pond' });
+    await platform.backgroundAudio.activate({ title: 'Hushglow' });
     expect((navigator as Navigator & { audioSession: { type: string } }).audioSession.type).toBe(
       'playback',
     );
@@ -144,7 +144,7 @@ describe('createWebPlatform: shareFile', () => {
     });
 
     const platform = createWebPlatform();
-    await platform.shareFile('firefly-pond-export.json', '{"sessions":[]}');
+    await platform.shareFile('hushglow-export.json', '{"sessions":[]}');
 
     expect(createObjectURL).toHaveBeenCalledTimes(1);
     const [blobArg] = createObjectURL.mock.calls[0] as [Blob];

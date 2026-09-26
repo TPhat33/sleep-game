@@ -4,7 +4,7 @@ import { buildExportPayload } from '@/store/exportData';
 import { DEFAULT_PROGRESS, DEFAULT_SETTINGS } from '@/store/db';
 import type { SessionSummary } from '@/core/types';
 
-const SECRET_JAR_TEXT = 'กังวลเรื่องพรุ่งนี้ที่ไม่ควรถูกส่งออก';
+const SECRET_JAR_TEXT = 'worried about tomorrow, should never be exported';
 
 function makeSession(overrides: Partial<SessionSummary>): SessionSummary {
   return {

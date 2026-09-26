@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// "สถิติของฉัน" (my stats) — spec §12 M5, plan §6 M5: computed from the
+// "My Stats" — spec §12 M5, plan §6 M5: computed from the
 // sessions store only. No session-by-session detail, no numbers that read
 // as a score — just the two aggregate rates plus an average, matching
 // design pillar 1 (no visible score/timer during play; this is a
@@ -16,13 +16,13 @@ const services = useServices();
 const stats = ref<SessionStats | null>(null);
 
 const BUCKET_LABELS: Record<'normal' | 'night_wake', string> = {
-  normal: 'เซสชันปกติ',
-  night_wake: 'ตื่นกลางดึก',
+  normal: 'Normal sessions',
+  night_wake: 'Night wake',
 };
 
 function formatMinutes(value: number | null): string {
   if (value === null) return '—';
-  return `${value.toFixed(0)} นาที`;
+  return `${value.toFixed(0)} min`;
 }
 
 function formatPercent(value: number): string {
@@ -38,25 +38,25 @@ onMounted(async () => {
 <template>
   <main class="stats">
     <header>
-      <button type="button" class="back" @click="$emit('back')">‹ กลับ</button>
-      <h1>สถิติของฉัน</h1>
+      <button type="button" class="back" @click="$emit('back')">‹ Back</button>
+      <h1>My Stats</h1>
     </header>
 
     <template v-if="stats">
       <section v-if="stats.overall.sessionCount === 0" class="empty">
-        <p>ยังไม่มีข้อมูลเซสชัน</p>
+        <p>No session data yet</p>
       </section>
       <template v-else>
         <section class="card">
-          <p class="label">เวลาเฉลี่ยกว่าจะหลับ</p>
+          <p class="label">Average time to fall asleep</p>
           <p class="value">{{ formatMinutes(stats.overall.averageMinutesToFade) }}</p>
         </section>
         <section class="card">
-          <p class="label">จบเซสชันด้วยการหลับ</p>
+          <p class="label">Sessions ending in sleep</p>
           <p class="value">{{ formatPercent(stats.overall.fadeRate) }}</p>
         </section>
         <section class="card">
-          <p class="label">จบเซสชันด้วยโหมดฟัง</p>
+          <p class="label">Sessions ending in listen mode</p>
           <p class="value">{{ formatPercent(stats.overall.listenRate) }}</p>
         </section>
 
@@ -66,10 +66,10 @@ onMounted(async () => {
               {{ BUCKET_LABELS[bucket.bucket] }} ({{ bucket.sessionCount }})
             </p>
             <p class="bucket-row">
-              เฉลี่ยกว่าจะหลับ: {{ formatMinutes(bucket.averageMinutesToFade) }}
+              Average to sleep: {{ formatMinutes(bucket.averageMinutesToFade) }}
             </p>
             <p class="bucket-row">
-              หลับ: {{ formatPercent(bucket.fadeRate) }} · ฟัง:
+              Sleep: {{ formatPercent(bucket.fadeRate) }} · Listen:
               {{ formatPercent(bucket.listenRate) }}
             </p>
           </div>

@@ -42,18 +42,18 @@ async function listenOnly(): Promise<void> {
 
 <template>
   <main class="home">
-    <h1>บึงหิ่งห้อย</h1>
+    <h1>Hushglow</h1>
     <div class="actions">
-      <button type="button" class="primary" :disabled="starting" @click="start">เริ่ม</button>
+      <button type="button" class="primary" :disabled="starting" @click="start">Start</button>
       <button type="button" class="secondary" :disabled="starting" @click="listenOnly">
-        ฟังอย่างเดียว
+        Listen only
       </button>
     </div>
     <nav class="tabs">
-      <button type="button" @click="emit('navigate', 'sky')">ท้องฟ้า</button>
-      <button type="button" @click="emit('navigate', 'journal')">สมุดความฝัน</button>
-      <button type="button" @click="emit('navigate', 'stats')">สถิติของฉัน</button>
-      <button type="button" @click="emit('navigate', 'settings')">ตั้งค่า</button>
+      <button type="button" @click="emit('navigate', 'sky')">Sky</button>
+      <button type="button" @click="emit('navigate', 'journal')">Journal</button>
+      <button type="button" @click="emit('navigate', 'stats')">My Stats</button>
+      <button type="button" @click="emit('navigate', 'settings')">Settings</button>
     </nav>
   </main>
 </template>
@@ -86,7 +86,7 @@ h1 {
 }
 
 button {
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 18px;
   font-weight: 300;
   border-radius: 12px;

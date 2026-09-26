@@ -22,7 +22,7 @@ export function cspPlugin(): Plugin {
   ].join('; ');
 
   return {
-    name: 'firefly-pond-csp',
+    name: 'hushglow-csp',
     apply: 'build',
     transformIndexHtml(html) {
       return html.replace(

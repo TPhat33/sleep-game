@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.fireflypond.dev',
-  appName: 'Firefly Pond',
+  appId: 'app.hushglow.dev',
+  appName: 'Hushglow',
   webDir: 'dist',
   backgroundColor: '#0B0806',
   ios: {

@@ -13,7 +13,7 @@ function makeDefs(count: number): DreamDef[] {
   const colors: DreamDef['color'][] = ['amber', 'ember', 'moss'];
   return Array.from({ length: count }, (_, i) => ({
     id: `d${String(i)}`,
-    nameTh: `ของฝัน${String(i)}`,
+    name: `Dream ${String(i)}`,
     color: colors[i % colors.length] ?? 'amber',
     sprite: `/dreams/d${String(i)}.svg`,
   }));
@@ -137,10 +137,10 @@ describe('PondModel.tapDream', () => {
 
   it('fills and resets the boat at BOAT_CAPACITY, reporting boatFilled', () => {
     const defs: DreamDef[] = [
-      { id: 'a', nameTh: 'a', color: 'amber', sprite: '/dreams/a.svg' },
-      { id: 'b', nameTh: 'b', color: 'amber', sprite: '/dreams/b.svg' },
-      { id: 'c', nameTh: 'c', color: 'amber', sprite: '/dreams/c.svg' },
-      { id: 'd', nameTh: 'd', color: 'amber', sprite: '/dreams/d.svg' },
+      { id: 'a', name: 'a', color: 'amber', sprite: '/dreams/a.svg' },
+      { id: 'b', name: 'b', color: 'amber', sprite: '/dreams/b.svg' },
+      { id: 'c', name: 'c', color: 'amber', sprite: '/dreams/c.svg' },
+      { id: 'd', name: 'd', color: 'amber', sprite: '/dreams/d.svg' },
     ];
     const model = makeModel(
       { BOAT_CAPACITY: 3, NO_REPEAT_WINDOW: 0, MAX_DREAMS_ON_SCREEN: 4 },

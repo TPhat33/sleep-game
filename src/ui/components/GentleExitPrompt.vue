@@ -33,11 +33,16 @@ function choose(choice: 'listen' | 'continue' | 'rest'): void {
 <template>
   <div v-if="visible" class="overlay">
     <div class="prompt">
-      <p>คืนนี้หลับยากหน่อยนะ จะลองโหมดฟังแบบปิดจอ หรือลุกไปนั่งพักที่อื่นสักครู่ก่อนก็ได้</p>
+      <p>
+        Sleep seems to be a bit hard to find tonight. You could try listen mode with the screen
+        off, or get up and rest somewhere else for a little while first.
+      </p>
       <div class="choices">
-        <button type="button" class="choice" @click="choose('listen')">ลองโหมดฟัง (ปิดจอ)</button>
-        <button type="button" class="choice" @click="choose('continue')">เล่นต่อ</button>
-        <button type="button" class="choice secondary" @click="choose('rest')">พักก่อน</button>
+        <button type="button" class="choice" @click="choose('listen')">
+          Try listen mode (screen off)
+        </button>
+        <button type="button" class="choice" @click="choose('continue')">Keep playing</button>
+        <button type="button" class="choice secondary" @click="choose('rest')">Rest for now</button>
       </div>
     </div>
   </div>
@@ -83,7 +88,7 @@ function choose(choice: 'listen' | 'continue' | 'rest'): void {
   border: 1px solid var(--color-amber);
   background: transparent;
   color: var(--color-amber);
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 16px;
   font-weight: 300;
 }

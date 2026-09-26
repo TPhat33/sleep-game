@@ -1,7 +1,7 @@
 <script setup lang="ts">
-// spec M4 acceptance: "Onboarding ถาม sleep latency bucket 1 ข้อ" — a
-// single question, then straight into the app. No accounts, no tutorial
-// carousel (design pillar: no streak/gamification pressure).
+// spec M4 acceptance: a single sleep-latency-bucket question, then
+// straight into the app. No accounts, no tutorial carousel (design
+// pillar: no streak/gamification pressure).
 import { ref } from 'vue';
 
 import type { SleepLatencyBucket } from '../../store/db';
@@ -13,9 +13,9 @@ const services = useServices();
 const saving = ref(false);
 
 const OPTIONS: { value: SleepLatencyBucket; label: string }[] = [
-  { value: '<15', label: 'น้อยกว่า 15 นาที' },
-  { value: '15-30', label: '15–30 นาที' },
-  { value: '>30', label: 'มากกว่า 30 นาที' },
+  { value: '<15', label: 'Less than 15 minutes' },
+  { value: '15-30', label: '15–30 minutes' },
+  { value: '>30', label: 'More than 30 minutes' },
 ];
 
 async function choose(bucket: SleepLatencyBucket): Promise<void> {
@@ -28,8 +28,8 @@ async function choose(bucket: SleepLatencyBucket): Promise<void> {
 
 <template>
   <main class="onboarding">
-    <h1>บึงหิ่งห้อย</h1>
-    <p class="question">ปกติคุณใช้เวลานานแค่ไหนกว่าจะหลับ?</p>
+    <h1>Hushglow</h1>
+    <p class="question">How long does it usually take you to fall asleep?</p>
     <div class="options">
       <button
         v-for="opt in OPTIONS"
@@ -86,7 +86,7 @@ h1 {
   border: 1px solid var(--color-amber);
   background: transparent;
   color: var(--color-amber);
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 18px;
   font-weight: 300;
 }

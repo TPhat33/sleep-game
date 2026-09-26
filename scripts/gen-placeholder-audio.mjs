@@ -208,7 +208,7 @@ function write(outUrl, buffer) {
 
 const bedDir = new URL('../public/audio/bed/', import.meta.url);
 const sfxDir = new URL('../public/audio/sfx/', import.meta.url);
-const voiceDir = new URL('../public/voice/th/', import.meta.url);
+const voiceDir = new URL('../public/voice/', import.meta.url);
 mkdirSync(fileURLToPath(bedDir), { recursive: true });
 mkdirSync(fileURLToPath(sfxDir), { recursive: true });
 mkdirSync(fileURLToPath(voiceDir), { recursive: true });
@@ -219,7 +219,7 @@ write(new URL('asmr-taps.wav', bedDir), genAsmrTapsLoop(SEED + 2, 6, 4));
 write(new URL('match-success.wav', sfxDir), genMatchSuccessSfx());
 write(new URL('star-rise.wav', sfxDir), genStarRiseSfx());
 
-const wordsPath = fileURLToPath(new URL('../src/content/words.th.json', import.meta.url));
+const wordsPath = fileURLToPath(new URL('../src/content/words.json', import.meta.url));
 const words = JSON.parse(readFileSync(wordsPath, 'utf8'));
 const VOICE_BURST_SECONDS = 0.7;
 words.forEach((_word, index) => {

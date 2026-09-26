@@ -21,7 +21,7 @@ async function answer(rating: EaseOfSleepRating): Promise<void> {
 <template>
   <div class="overlay">
     <div class="survey">
-      <p>เมื่อคืนหลับง่ายแค่ไหน?</p>
+      <p>How easily did you fall asleep last night?</p>
       <div class="ratings">
         <button
           v-for="rating in RATINGS"
@@ -33,7 +33,7 @@ async function answer(rating: EaseOfSleepRating): Promise<void> {
           {{ rating }}
         </button>
       </div>
-      <button type="button" class="skip" @click="emit('done')">ข้าม</button>
+      <button type="button" class="skip" @click="emit('done')">Skip</button>
     </div>
   </div>
 </template>

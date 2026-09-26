@@ -4,11 +4,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { FakeClock } from '@/core/clock';
 import { openAppDb } from '@/store/db';
-import type { FireflyPondDB } from '@/store/db';
+import type { HushglowDB } from '@/store/db';
 import { Repositories } from '@/store/repositories';
 import type { IDBPDatabase } from 'idb';
 
-let openDbs: IDBPDatabase<FireflyPondDB>[] = [];
+let openDbs: IDBPDatabase<HushglowDB>[] = [];
 
 afterEach(() => {
   for (const db of openDbs) db.close();

@@ -28,7 +28,7 @@ export interface SessionRuntimeDeps {
   };
 }
 
-const NOW_PLAYING_META = { title: 'Firefly Pond' };
+const NOW_PLAYING_META = { title: 'Hushglow' };
 
 /** Phases where a backgrounded app is on a grace-period countdown to `ended('app_background')` — plan §1.9. */
 const GRACED_PHASES: ReadonlySet<Phase> = new Set<Phase>(['settle', 'play', 'drift']);

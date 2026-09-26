@@ -15,7 +15,7 @@ import { systemRng } from '../core/rng';
 import { SessionDirector } from '../core/session/SessionDirector';
 import { createPlatform } from '../platform';
 import visitors from '../content/visitors.json';
-import words from '../content/words.th.json';
+import words from '../content/words.json';
 import { openAppDb } from '../store/db';
 import { Repositories } from '../store/repositories';
 import { SessionRuntime } from './SessionRuntime';

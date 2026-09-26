@@ -6,7 +6,7 @@ import type { ConstellationDef } from '@/core/types';
 function makeConstellation(id: string, starCount: number): ConstellationDef {
   return {
     id,
-    nameTh: id,
+    name: id,
     stars: Array.from({ length: starCount }, () => ({ x: 0.5, y: 0.5 })),
   };
 }

@@ -72,7 +72,7 @@ export interface Platform {
   onBackButton(fn: () => void): Unsubscribe;
   /**
    * Offers a plain-text file to the OS share sheet (M5 opt-in JSON
-   * export, spec §12). `name` is a filename hint, e.g. 'firefly-pond-export.json'.
+   * export, spec §12). `name` is a filename hint, e.g. 'hushglow-export.json'.
    * Web: triggers a Blob download. No network call either way (spec §0).
    */
   shareFile(name: string, text: string): Promise<void>;

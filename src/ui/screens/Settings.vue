@@ -14,10 +14,10 @@ const settings = ref<SettingsRecord | null>(null);
 const exporting = ref(false);
 
 const LAYER_LABELS: Record<BedLayerId, string> = {
-  rain: 'เสียงฝน',
-  crickets: 'เสียงจิ้งหรีด',
-  brownNoise: 'บราวน์นอยส์',
-  asmrTaps: 'เสียงแตะเบาๆ',
+  rain: 'Rain',
+  crickets: 'Crickets',
+  brownNoise: 'Brown noise',
+  asmrTaps: 'Gentle taps',
 };
 const ALL_LAYERS: readonly BedLayerId[] = ['rain', 'crickets', 'brownNoise', 'asmrTaps'];
 
@@ -69,7 +69,7 @@ async function exportData(): Promise<void> {
       services.repositories.sessions.list(),
     ]);
     const payload = buildExportPayload(services.clock.now(), settings.value, progress, sessions);
-    await services.platform.shareFile('firefly-pond-export.json', JSON.stringify(payload, null, 2));
+    await services.platform.shareFile('hushglow-export.json', JSON.stringify(payload, null, 2));
   } finally {
     exporting.value = false;
   }
@@ -79,12 +79,12 @@ async function exportData(): Promise<void> {
 <template>
   <main v-if="settings" class="settings">
     <header>
-      <button type="button" class="back" @click="$emit('back')">‹ กลับ</button>
-      <h1>ตั้งค่า</h1>
+      <button type="button" class="back" @click="$emit('back')">‹ Back</button>
+      <h1>Settings</h1>
     </header>
 
     <section>
-      <p class="section-title">เสียงพื้นหลัง</p>
+      <p class="section-title">Background sounds</p>
       <label v-for="layer in ALL_LAYERS" :key="layer" class="row">
         <input
           type="checkbox"
@@ -98,16 +98,16 @@ async function exportData(): Promise<void> {
     <section>
       <label class="row">
         <input type="checkbox" :checked="settings.voiceEnabled" @change="toggleVoice" />
-        <span>เสียงกระซิบคำ</span>
+        <span>Whispered words</span>
       </label>
       <label class="row">
         <input type="checkbox" :checked="settings.breathCueEnabled" @change="toggleBreathCue" />
-        <span>เสียงหายใจนำ</span>
+        <span>Breathing cue</span>
       </label>
     </section>
 
     <section>
-      <p class="section-title">เวลาโหมดฟัง (นาที)</p>
+      <p class="section-title">Listen mode duration (minutes)</p>
       <div class="options">
         <button
           v-for="minutes in CONFIG.audio.LISTEN_OPTIONS_MIN"
@@ -123,10 +123,10 @@ async function exportData(): Promise<void> {
     </section>
 
     <section>
-      <p class="section-title">ข้อมูล</p>
+      <p class="section-title">Data</p>
       <label class="row">
         <input type="checkbox" :checked="settings.analyticsOptIn" @change="toggleAnalyticsOptIn" />
-        <span>อนุญาตให้ส่งออกข้อมูลสถิติได้</span>
+        <span>Allow exporting my stats data</span>
       </label>
       <button
         v-if="settings.analyticsOptIn"
@@ -135,7 +135,7 @@ async function exportData(): Promise<void> {
         :disabled="exporting"
         @click="exportData"
       >
-        ส่งออกข้อมูล (JSON)
+        Export data (JSON)
       </button>
     </section>
   </main>
@@ -198,7 +198,7 @@ h1 {
   border: 1px solid var(--color-text-dim);
   background: transparent;
   color: var(--color-text-dim);
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 16px;
 }
 

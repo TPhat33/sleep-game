@@ -44,8 +44,8 @@ function extend(): void {
 <template>
   <main class="listen" @click="reveal">
     <div v-if="controlsVisible" class="controls">
-      <button type="button" class="control" @click.stop="extend">ต่อเวลา</button>
-      <button type="button" class="control" @click.stop="stop">หยุด</button>
+      <button type="button" class="control" @click.stop="extend">Extend</button>
+      <button type="button" class="control" @click.stop="stop">Stop</button>
     </div>
   </main>
 </template>
@@ -72,7 +72,7 @@ function extend(): void {
   color: var(--color-text-dim);
   border-radius: 20px;
   padding: 10px 20px;
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 14px;
   opacity: 0.6;
 }

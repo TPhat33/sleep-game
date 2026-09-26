@@ -15,15 +15,15 @@ function trackErrors(page: import('@playwright/test').Page): string[] {
 
 async function completeOnboarding(page: import('@playwright/test').Page): Promise<void> {
   await page.goto('/');
-  await expect(page.getByText('ปกติคุณใช้เวลานานแค่ไหนกว่าจะหลับ?')).toBeVisible();
-  await page.getByRole('button', { name: '15–30 นาที' }).click();
+  await expect(page.getByText('How long does it usually take you to fall asleep?')).toBeVisible();
+  await page.getByRole('button', { name: '15–30 minutes' }).click();
 }
 
 test.describe('Onboarding -> Home', () => {
   test('asks one sleep-latency question, then shows Home', async ({ page }) => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
-    await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Start' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 });
@@ -33,10 +33,10 @@ test.describe('Home -> Settle -> Play', () => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
 
-    await page.getByRole('button', { name: 'เริ่ม' }).click();
-    await expect(page.getByText('มีอะไรอยากเก็บไว้ในขวดก่อนนอนไหม?')).toBeVisible();
+    await page.getByRole('button', { name: 'Start' }).click();
+    await expect(page.getByText("Anything you'd like to put in the jar before sleep?")).toBeVisible();
 
-    await page.getByRole('button', { name: 'ข้าม' }).click();
+    await page.getByRole('button', { name: 'Skip' }).click();
     await expect(page.locator('.pond canvas')).toBeVisible();
 
     expect(errors).toEqual([]);
@@ -45,13 +45,13 @@ test.describe('Home -> Settle -> Play', () => {
   test('the jar accepts typed items and closing the lid enters Play', async ({ page }) => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
-    await page.getByRole('button', { name: 'เริ่ม' }).click();
+    await page.getByRole('button', { name: 'Start' }).click();
 
-    await page.getByPlaceholder('พิมพ์ที่นี่...').fill('กังวลเรื่องพรุ่งนี้');
-    await page.getByRole('button', { name: 'เพิ่ม' }).click();
-    await expect(page.getByText('กังวลเรื่องพรุ่งนี้')).toBeVisible();
+    await page.getByPlaceholder('Type here...').fill('Worried about tomorrow');
+    await page.getByRole('button', { name: 'Add' }).click();
+    await expect(page.getByText('Worried about tomorrow')).toBeVisible();
 
-    await page.getByRole('button', { name: 'ปิดฝาขวด' }).click();
+    await page.getByRole('button', { name: 'Close the jar' }).click();
     await expect(page.locator('.pond canvas')).toBeVisible();
 
     expect(errors).toEqual([]);
@@ -60,8 +60,8 @@ test.describe('Home -> Settle -> Play', () => {
   test('tapping the pond canvas does not throw', async ({ page }) => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
-    await page.getByRole('button', { name: 'เริ่ม' }).click();
-    await page.getByRole('button', { name: 'ข้าม' }).click();
+    await page.getByRole('button', { name: 'Start' }).click();
+    await page.getByRole('button', { name: 'Skip' }).click();
 
     const canvas = page.locator('.pond canvas');
     await expect(canvas).toBeVisible();
@@ -79,14 +79,14 @@ test.describe('Home -> Listen only', () => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
 
-    await page.getByRole('button', { name: 'ฟังอย่างเดียว' }).click();
+    await page.getByRole('button', { name: 'Listen only' }).click();
     const listen = page.locator('.listen');
     await expect(listen).toBeVisible();
-    await expect(page.getByRole('button', { name: 'หยุด' })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: 'Stop' })).not.toBeVisible();
 
     await listen.click();
-    await expect(page.getByRole('button', { name: 'หยุด' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'ต่อเวลา' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Stop' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Extend' })).toBeVisible();
 
     expect(errors).toEqual([]);
   });
@@ -94,10 +94,10 @@ test.describe('Home -> Listen only', () => {
   test('the stop button ends the session and returns to Home', async ({ page }) => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
-    await page.getByRole('button', { name: 'ฟังอย่างเดียว' }).click();
+    await page.getByRole('button', { name: 'Listen only' }).click();
     await page.locator('.listen').click();
-    await page.getByRole('button', { name: 'หยุด' }).click();
-    await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
+    await page.getByRole('button', { name: 'Stop' }).click();
+    await expect(page.getByRole('button', { name: 'Start' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 });
@@ -107,26 +107,26 @@ test.describe('Home navigation', () => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
 
-    await page.getByRole('button', { name: 'ท้องฟ้า' }).click();
-    await expect(page.getByRole('heading', { name: 'ท้องฟ้า' })).toBeVisible();
-    await page.getByRole('button', { name: '‹ กลับ' }).click();
-    await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
+    await page.getByRole('button', { name: 'Sky' }).click();
+    await expect(page.getByRole('heading', { name: 'Sky' })).toBeVisible();
+    await page.getByRole('button', { name: '‹ Back' }).click();
+    await expect(page.getByRole('button', { name: 'Start' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'สมุดความฝัน' }).click();
-    await expect(page.getByRole('heading', { name: 'สมุดความฝัน' })).toBeVisible();
-    await page.getByRole('button', { name: '‹ กลับ' }).click();
-    await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
+    await page.getByRole('button', { name: 'Journal' }).click();
+    await expect(page.getByRole('heading', { name: 'Dream Journal' })).toBeVisible();
+    await page.getByRole('button', { name: '‹ Back' }).click();
+    await expect(page.getByRole('button', { name: 'Start' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'ตั้งค่า' }).click();
-    await expect(page.getByRole('heading', { name: 'ตั้งค่า' })).toBeVisible();
-    await page.getByRole('button', { name: '‹ กลับ' }).click();
-    await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
+    await page.getByRole('button', { name: 'Settings' }).click();
+    await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+    await page.getByRole('button', { name: '‹ Back' }).click();
+    await expect(page.getByRole('button', { name: 'Start' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'สถิติของฉัน' }).click();
-    await expect(page.getByRole('heading', { name: 'สถิติของฉัน' })).toBeVisible();
-    await expect(page.getByText('ยังไม่มีข้อมูลเซสชัน')).toBeVisible();
-    await page.getByRole('button', { name: '‹ กลับ' }).click();
-    await expect(page.getByRole('button', { name: 'เริ่ม' })).toBeVisible();
+    await page.getByRole('button', { name: 'My Stats' }).click();
+    await expect(page.getByRole('heading', { name: 'My Stats' })).toBeVisible();
+    await expect(page.getByText('No session data yet')).toBeVisible();
+    await page.getByRole('button', { name: '‹ Back' }).click();
+    await expect(page.getByRole('button', { name: 'Start' })).toBeVisible();
 
     expect(errors).toEqual([]);
   });
@@ -134,9 +134,9 @@ test.describe('Home navigation', () => {
   test('toggling a bed layer and changing the listen duration persists', async ({ page }) => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
-    await page.getByRole('button', { name: 'ตั้งค่า' }).click();
+    await page.getByRole('button', { name: 'Settings' }).click();
 
-    await page.getByText('เสียงจิ้งหรีด').click();
+    await page.getByText('Crickets').click();
     await expect(page.getByRole('checkbox').nth(1)).toBeChecked();
 
     await page.getByRole('button', { name: '90', exact: true }).click();
@@ -146,7 +146,7 @@ test.describe('Home navigation', () => {
     // for them to land in the DOM, which only happens after they resolve —
     // safe to reload now.
     await page.reload();
-    await page.getByRole('button', { name: 'ตั้งค่า' }).click();
+    await page.getByRole('button', { name: 'Settings' }).click();
     await expect(page.getByRole('checkbox').nth(1)).toBeChecked();
     await expect(page.getByRole('button', { name: '90', exact: true })).toHaveClass(/active/);
 
@@ -156,16 +156,16 @@ test.describe('Home navigation', () => {
   test('the opt-in export downloads a JSON file with no jar content', async ({ page }) => {
     const errors = trackErrors(page);
     await completeOnboarding(page);
-    await page.getByRole('button', { name: 'ตั้งค่า' }).click();
+    await page.getByRole('button', { name: 'Settings' }).click();
 
-    await expect(page.getByRole('button', { name: /ส่งออกข้อมูล/ })).not.toBeVisible();
-    await page.getByText('อนุญาตให้ส่งออกข้อมูลสถิติได้').click();
+    await expect(page.getByRole('button', { name: /Export data/ })).not.toBeVisible();
+    await page.getByText('Allow exporting my stats data').click();
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByRole('button', { name: /ส่งออกข้อมูล/ }).click(),
+      page.getByRole('button', { name: /Export data/ }).click(),
     ]);
-    expect(download.suggestedFilename()).toBe('firefly-pond-export.json');
+    expect(download.suggestedFilename()).toBe('hushglow-export.json');
 
     const path = await download.path();
     const text = path ? await import('node:fs').then((fs) => fs.readFileSync(path, 'utf8')) : '';

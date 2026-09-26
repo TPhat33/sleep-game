@@ -1,6 +1,6 @@
 {
-  "name": "Firefly Pond",
-  "short_name": "Firefly Pond",
+  "name": "Hushglow",
+  "short_name": "Hushglow",
   "description": "A relaxation game that helps you fall asleep.",
   "start_url": "./index.html",
   "display": "standalone",

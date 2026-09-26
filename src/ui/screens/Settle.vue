@@ -47,7 +47,7 @@ function skip(): void {
 
 <template>
   <main class="settle">
-    <p class="prompt">มีอะไรอยากเก็บไว้ในขวดก่อนนอนไหม?</p>
+    <p class="prompt">Anything you'd like to put in the jar before sleep?</p>
 
     <ul class="jar-items">
       <li v-for="(item, index) in items" :key="index">
@@ -61,15 +61,17 @@ function skip(): void {
         v-model="draft"
         :maxlength="maxChars"
         type="text"
-        placeholder="พิมพ์ที่นี่..."
+        placeholder="Type here..."
         @keyup.enter="addItem"
       />
-      <button type="button" class="add" :disabled="!canAdd" @click="addItem">เพิ่ม</button>
+      <button type="button" class="add" :disabled="!canAdd" @click="addItem">Add</button>
     </div>
 
     <div class="actions">
-      <button type="button" class="primary" :disabled="closing" @click="closeLid">ปิดฝาขวด</button>
-      <button type="button" class="secondary" :disabled="closing" @click="skip">ข้าม</button>
+      <button type="button" class="primary" :disabled="closing" @click="closeLid">
+        Close the jar
+      </button>
+      <button type="button" class="secondary" :disabled="closing" @click="skip">Skip</button>
     </div>
   </main>
 </template>
@@ -141,7 +143,7 @@ function skip(): void {
   border: 1px solid var(--color-text-dim);
   background: transparent;
   color: var(--color-amber);
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 16px;
 }
 
@@ -151,7 +153,7 @@ function skip(): void {
   border: 1px solid var(--color-amber);
   background: transparent;
   color: var(--color-amber);
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
 }
 
 .add:disabled {
@@ -168,7 +170,7 @@ function skip(): void {
 }
 
 .actions button {
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 18px;
   font-weight: 300;
   border-radius: 12px;

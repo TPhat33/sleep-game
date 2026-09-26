@@ -165,7 +165,7 @@ describe('createCapacitorPlatform: remote commands (Android)', () => {
     const received: string[] = [];
     platform.backgroundAudio.onRemoteCommand((cmd) => received.push(cmd));
 
-    await platform.backgroundAudio.activate({ title: 'Firefly Pond' });
+    await platform.backgroundAudio.activate({ title: 'Hushglow' });
 
     const playHandler = setActionHandler.mock.calls.find((c) => c[0].action === 'play')?.[1];
     const pauseHandler = setActionHandler.mock.calls.find((c) => c[0].action === 'pause')?.[1];
@@ -184,11 +184,11 @@ describe('createCapacitorPlatform: shareFile', () => {
     getPlatform.mockReturnValue('ios');
     const platform = await createCapacitorPlatform();
 
-    await platform.shareFile('firefly-pond-export.json', '{"sessions":[]}');
+    await platform.shareFile('hushglow-export.json', '{"sessions":[]}');
 
     expect(writeFile).toHaveBeenCalledWith(
       expect.objectContaining({
-        path: 'firefly-pond-export.json',
+        path: 'hushglow-export.json',
         data: '{"sessions":[]}',
         directory: 'CACHE',
         encoding: 'utf8',

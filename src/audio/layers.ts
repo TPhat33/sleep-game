@@ -26,5 +26,5 @@ export const SFX_URLS: Record<SfxId, string> = {
 };
 
 export function voiceWordUrl(index: number): string {
-  return `/voice/th/${String(index)}.wav`;
+  return `/voice/${String(index)}.wav`;
 }

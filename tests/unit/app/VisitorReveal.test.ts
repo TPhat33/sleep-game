@@ -9,8 +9,8 @@ import type { ProgressRecord } from '@/store/db';
 import { DEFAULT_PROGRESS } from '@/store/db';
 
 const VISITORS: VisitorDef[] = [
-  { id: 'owl', nameTh: 'นกฮูก', sprite: '/visitors/owl.svg' },
-  { id: 'moth', nameTh: 'ผีเสื้อกลางคืน', sprite: '/visitors/moth.svg' },
+  { id: 'owl', name: 'Owl', sprite: '/visitors/owl.svg' },
+  { id: 'moth', name: 'Moth', sprite: '/visitors/moth.svg' },
 ];
 
 function createFakeProgressRepo(initial: ProgressRecord = DEFAULT_PROGRESS) {

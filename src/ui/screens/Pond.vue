@@ -111,7 +111,7 @@ function requestListen(): void {
   <main class="pond">
     <div ref="containerRef" class="canvas-host" @pointerdown="handlePointerDown" />
     <button type="button" class="listen-button" @click="requestListen">
-      {{ listenOfferShown ? 'ฟังต่อแบบปิดจอ' : 'ฟังแบบปิดจอ' }}
+      {{ listenOfferShown ? 'Continue listening, screen off' : 'Listen with screen off' }}
     </button>
     <GentleExitPrompt />
   </main>
@@ -140,7 +140,7 @@ function requestListen(): void {
   color: var(--color-text-dim);
   border-radius: 16px;
   padding: 8px 14px;
-  font-family: var(--font-thai);
+  font-family: var(--font-primary);
   font-size: 13px;
   opacity: 0.7;
 }

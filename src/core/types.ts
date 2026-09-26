@@ -8,7 +8,7 @@ export type DreamColor = 'amber' | 'ember' | 'moss';
 
 export interface DreamDef {
   id: string;
-  nameTh: string;
+  name: string;
   color: DreamColor;
   sprite: string;
 }
@@ -94,13 +94,13 @@ export interface StarPosition {
 /** `constellations.json` (spec §11, §15): `stars.length === CONFIG.meta.STARS_PER_CONSTELLATION`. */
 export interface ConstellationDef {
   id: string;
-  nameTh: string;
+  name: string;
   stars: readonly StarPosition[];
 }
 
 /** `visitors.json` (spec §11, §15). */
 export interface VisitorDef {
   id: string;
-  nameTh: string;
+  name: string;
   sprite: string;
 }

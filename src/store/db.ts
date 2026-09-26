@@ -8,7 +8,7 @@ import { openDB } from 'idb';
 
 import type { BedLayerId, SessionSummary } from '../core/types';
 
-export const DB_NAME = 'firefly-pond';
+export const DB_NAME = 'hushglow';
 export const DB_VERSION = 1;
 
 export type SleepLatencyBucket = '<15' | '15-30' | '>30';
@@ -51,7 +51,7 @@ export interface SurveyRecord {
   answeredAt: number;
 }
 
-export interface FireflyPondDB extends DBSchema {
+export interface HushglowDB extends DBSchema {
   settings: {
     key: 'main';
     value: SettingsRecord;
@@ -77,11 +77,11 @@ export interface FireflyPondDB extends DBSchema {
 }
 
 type UpgradeTransaction = IDBPTransaction<
-  FireflyPondDB,
-  StoreNames<FireflyPondDB>[],
+  HushglowDB,
+  StoreNames<HushglowDB>[],
   'versionchange'
 >;
-type Migration = (db: IDBPDatabase<FireflyPondDB>, tx: UpgradeTransaction) => void;
+type Migration = (db: IDBPDatabase<HushglowDB>, tx: UpgradeTransaction) => void;
 
 export const MIGRATIONS: readonly Migration[] = [
   (db) => {
@@ -93,8 +93,8 @@ export const MIGRATIONS: readonly Migration[] = [
   },
 ];
 
-export function openAppDb(name: string = DB_NAME): Promise<IDBPDatabase<FireflyPondDB>> {
-  return openDB<FireflyPondDB>(name, DB_VERSION, {
+export function openAppDb(name: string = DB_NAME): Promise<IDBPDatabase<HushglowDB>> {
+  return openDB<HushglowDB>(name, DB_VERSION, {
     upgrade(db, oldVersion, newVersion, transaction) {
       const target = newVersion ?? MIGRATIONS.length;
       for (const migrate of MIGRATIONS.slice(oldVersion, target)) {

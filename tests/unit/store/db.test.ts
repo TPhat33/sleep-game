@@ -3,17 +3,17 @@ import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { DB_VERSION, openAppDb } from '@/store/db';
-import type { FireflyPondDB } from '@/store/db';
+import type { HushglowDB } from '@/store/db';
 import type { IDBPDatabase } from 'idb';
 
-let openDbs: IDBPDatabase<FireflyPondDB>[] = [];
+let openDbs: IDBPDatabase<HushglowDB>[] = [];
 
 afterEach(() => {
   for (const db of openDbs) db.close();
   openDbs = [];
 });
 
-async function freshDb(): Promise<IDBPDatabase<FireflyPondDB>> {
+async function freshDb(): Promise<IDBPDatabase<HushglowDB>> {
   const db = await openAppDb(`test-${Math.random().toString(36).slice(2)}`);
   openDbs.push(db);
   return db;
@@ -89,12 +89,12 @@ describe('openAppDb', () => {
     const name = `test-${Math.random().toString(36).slice(2)}`;
     const db1 = await openAppDb(name);
     openDbs.push(db1);
-    await db1.put('jar', { id: 'x', createdAt: 1, items: ['ร่ม'] });
+    await db1.put('jar', { id: 'x', createdAt: 1, items: ['umbrella'] });
     db1.close();
 
     const db2 = await openAppDb(name);
     openDbs.push(db2);
     const record = await db2.get('jar', 'x');
-    expect(record?.items).toEqual(['ร่ม']);
+    expect(record?.items).toEqual(['umbrella']);
   });
 });

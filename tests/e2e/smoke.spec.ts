@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Home', () => {
-  test('renders the Thai title with no console errors', async ({ page }) => {
+  test('renders the title with no console errors', async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (err) => errors.push(String(err)));
     page.on('console', (msg) => {
@@ -9,7 +9,7 @@ test.describe('Home', () => {
     });
 
     await page.goto('/');
-    await expect(page.getByText('บึงหิ่งห้อย')).toBeVisible();
+    await expect(page.getByText('Hushglow')).toBeVisible();
     expect(errors).toEqual([]);
   });
 });
@@ -18,7 +18,7 @@ test.describe('Platform spike', () => {
   test('renders and reports platform info', async ({ page }) => {
     await page.goto('/spike.html');
     await expect(
-      page.getByRole('heading', { name: 'Firefly Pond — Platform Spike' }),
+      page.getByRole('heading', { name: 'Hushglow — Platform Spike' }),
     ).toBeVisible();
     await expect(page.getByText(/^unsupported \(web\)/)).toBeVisible();
   });

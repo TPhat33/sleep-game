@@ -1,14 +1,14 @@
 // Content-validation tests, spec §15: dreams.json (30 items, 10 per color,
-// sprites present under public/), words.th.json (~150 unique Thai-script
-// concrete nouns), constellations.json (stars.length === STARS_PER_CONSTELLATION,
-// normalized positions) and visitors.json (sprites present under public/).
+// sprites present under public/), words.json (~150 unique concrete nouns),
+// constellations.json (stars.length === STARS_PER_CONSTELLATION, normalized
+// positions) and visitors.json (sprites present under public/).
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
 import dreams from '@/content/dreams.json';
-import words from '@/content/words.th.json';
+import words from '@/content/words.json';
 import constellations from '@/content/constellations.json';
 import visitors from '@/content/visitors.json';
 import { CONFIG } from '@/core/config';
@@ -16,7 +16,8 @@ import type { ConstellationDef, DreamColor, DreamDef, VisitorDef } from '@/core/
 
 const PUBLIC_DIR = fileURLToPath(new URL('../../../public/', import.meta.url));
 const DREAM_COLORS: readonly DreamColor[] = ['amber', 'ember', 'moss'];
-const THAI_ONLY = /^[฀-๿]+$/;
+/** English letters and spaces only — words may be multi-word (e.g. "Maple Leaf"). */
+const ENGLISH_ONLY = /^[A-Za-z]+(?: [A-Za-z]+)*$/;
 
 function assertUniqueIds(items: readonly { id: string }[]): void {
   const seen = new Set<string>();
@@ -39,11 +40,11 @@ describe('content: dreams.json', () => {
     }
   });
 
-  it('has unique, non-empty ids and Thai names', () => {
+  it('has unique, non-empty ids and names', () => {
     assertUniqueIds(typedDreams);
     for (const d of typedDreams) {
       expect(d.id.length).toBeGreaterThan(0);
-      expect(d.nameTh.length).toBeGreaterThan(0);
+      expect(d.name.length).toBeGreaterThan(0);
     }
   });
 
@@ -61,7 +62,7 @@ describe('content: dreams.json', () => {
   });
 });
 
-describe('content: words.th.json', () => {
+describe('content: words.json', () => {
   const typedWords = words;
 
   it('has about 150 words (spec §15)', () => {
@@ -75,9 +76,9 @@ describe('content: words.th.json', () => {
     }
   });
 
-  it('is Thai script only (no Latin letters, digits, or punctuation)', () => {
+  it('is English letters only (no digits or punctuation)', () => {
     for (const w of typedWords) {
-      expect(w).toMatch(THAI_ONLY);
+      expect(w).toMatch(ENGLISH_ONLY);
     }
   });
 });
@@ -89,11 +90,11 @@ describe('content: constellations.json', () => {
     expect(typedConstellations.length).toBeGreaterThan(0);
   });
 
-  it('has unique, non-empty ids and Thai names', () => {
+  it('has unique, non-empty ids and names', () => {
     assertUniqueIds(typedConstellations);
     for (const c of typedConstellations) {
       expect(c.id.length).toBeGreaterThan(0);
-      expect(c.nameTh.length).toBeGreaterThan(0);
+      expect(c.name.length).toBeGreaterThan(0);
     }
   });
 
@@ -122,11 +123,11 @@ describe('content: visitors.json', () => {
     expect(typedVisitors.length).toBeGreaterThan(0);
   });
 
-  it('has unique, non-empty ids and Thai names', () => {
+  it('has unique, non-empty ids and names', () => {
     assertUniqueIds(typedVisitors);
     for (const v of typedVisitors) {
       expect(v.id.length).toBeGreaterThan(0);
-      expect(v.nameTh.length).toBeGreaterThan(0);
+      expect(v.name.length).toBeGreaterThan(0);
     }
   });
 

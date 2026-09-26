@@ -1,7 +1,7 @@
 [
   {
     "id": "firefly",
-    "nameTh": "หิ่งห้อย",
+    "name": "Firefly",
     "stars": [
       {
         "x": 0.416,
@@ -55,7 +55,7 @@
   },
   {
     "id": "sailboat",
-    "nameTh": "เรือใบ",
+    "name": "Sailboat",
     "stars": [
       {
         "x": 0.61,
@@ -109,7 +109,7 @@
   },
   {
     "id": "butterfly-wings",
-    "nameTh": "ปีกผีเสื้อ",
+    "name": "Butterfly Wings",
     "stars": [
       {
         "x": 0.5,
@@ -163,7 +163,7 @@
   },
   {
     "id": "wind",
-    "nameTh": "สายลม",
+    "name": "Wind",
     "stars": [
       {
         "x": 0.15,
@@ -217,7 +217,7 @@
   },
   {
     "id": "spiral-shell",
-    "nameTh": "ก้นหอย",
+    "name": "Spiral Shell",
     "stars": [
       {
         "x": 0.6,
@@ -271,7 +271,7 @@
   },
   {
     "id": "water-wave",
-    "nameTh": "คลื่นน้ำ",
+    "name": "Water Wave",
     "stars": [
       {
         "x": 0.2,

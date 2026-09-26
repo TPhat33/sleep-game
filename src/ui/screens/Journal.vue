@@ -25,8 +25,8 @@ const seenSet = computed(() => new Set(seenIds.value));
 <template>
   <main class="journal">
     <header>
-      <button type="button" class="back" @click="$emit('back')">‹ กลับ</button>
-      <h1>สมุดความฝัน</h1>
+      <button type="button" class="back" @click="$emit('back')">‹ Back</button>
+      <h1>Dream Journal</h1>
     </header>
 
     <p class="count">{{ seenDreams.length }} / {{ typedDreams.length }}</p>
@@ -38,9 +38,9 @@ const seenSet = computed(() => new Set(seenIds.value));
         class="entry"
         :class="{ seen: seenSet.has(dream.id) }"
       >
-        <img v-if="seenSet.has(dream.id)" :src="dream.sprite" :alt="dream.nameTh" class="sprite" />
+        <img v-if="seenSet.has(dream.id)" :src="dream.sprite" :alt="dream.name" class="sprite" />
         <div v-else class="sprite placeholder" />
-        <p class="label">{{ seenSet.has(dream.id) ? dream.nameTh : '?' }}</p>
+        <p class="label">{{ seenSet.has(dream.id) ? dream.name : '?' }}</p>
       </div>
     </div>
   </main>

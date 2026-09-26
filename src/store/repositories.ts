@@ -7,7 +7,7 @@ import type { Clock } from '../core/clock';
 import type { LastSessionInfo, SessionSummary } from '../core/types';
 import type {
   EaseOfSleepRating,
-  FireflyPondDB,
+  HushglowDB,
   JarRecord,
   ProgressRecord,
   SettingsRecord,
@@ -16,7 +16,7 @@ import type {
 import { DEFAULT_PROGRESS, DEFAULT_SETTINGS } from './db';
 
 export class SettingsRepository {
-  constructor(private readonly db: IDBPDatabase<FireflyPondDB>) {}
+  constructor(private readonly db: IDBPDatabase<HushglowDB>) {}
 
   async get(): Promise<SettingsRecord> {
     const record = await this.db.get('settings', 'main');
@@ -32,7 +32,7 @@ export class SettingsRepository {
 }
 
 export class ProgressRepository {
-  constructor(private readonly db: IDBPDatabase<FireflyPondDB>) {}
+  constructor(private readonly db: IDBPDatabase<HushglowDB>) {}
 
   async get(): Promise<ProgressRecord> {
     const record = await this.db.get('progress', 'main');
@@ -78,7 +78,7 @@ export class ProgressRepository {
 
 export class SessionsRepository {
   constructor(
-    private readonly db: IDBPDatabase<FireflyPondDB>,
+    private readonly db: IDBPDatabase<HushglowDB>,
     private readonly ids: () => string,
   ) {}
 
@@ -132,7 +132,7 @@ export class SessionsRepository {
 
 export class JarRepository {
   constructor(
-    private readonly db: IDBPDatabase<FireflyPondDB>,
+    private readonly db: IDBPDatabase<HushglowDB>,
     private readonly clock: Clock,
     private readonly ids: () => string,
   ) {}
@@ -166,7 +166,7 @@ export class JarRepository {
 }
 
 export class SurveysRepository {
-  constructor(private readonly db: IDBPDatabase<FireflyPondDB>) {}
+  constructor(private readonly db: IDBPDatabase<HushglowDB>) {}
 
   async get(dateKey: string): Promise<SurveyRecord | null> {
     const record = await this.db.get('surveys', dateKey);
@@ -191,7 +191,7 @@ export class Repositories {
   readonly jar: JarRepository;
   readonly surveys: SurveysRepository;
 
-  constructor(db: IDBPDatabase<FireflyPondDB>, clock: Clock, ids: () => string) {
+  constructor(db: IDBPDatabase<HushglowDB>, clock: Clock, ids: () => string) {
     this.settings = new SettingsRepository(db);
     this.progress = new ProgressRepository(db);
     this.sessions = new SessionsRepository(db, ids);
